@@ -76,4 +76,4 @@ DerivedDataCache/*
 
 # Content assets
 Content/*
-!Content/Blueprint/*
+!Content/Blueprint/
