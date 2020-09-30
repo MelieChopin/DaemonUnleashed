@@ -1,6 +1,7 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "KillForGloryCharacter.h"
+
+#include "KFGPlayer.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,9 +11,9 @@
 #include "GameFramework/SpringArmComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
-// AKillForGloryCharacter
+// AKFGPlayer
 
-AKillForGloryCharacter::AKillForGloryCharacter()
+AKFGPlayer::AKFGPlayer()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -50,61 +51,38 @@ AKillForGloryCharacter::AKillForGloryCharacter()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void AKillForGloryCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AKillForGloryCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AKillForGloryCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AKFGPlayer::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AKFGPlayer::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &AKillForGloryCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("TurnRate", this, &AKFGPlayer::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &AKillForGloryCharacter::LookUpAtRate);
-
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AKillForGloryCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AKillForGloryCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AKillForGloryCharacter::OnResetVR);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &AKFGPlayer::LookUpAtRate);
 }
 
-
-void AKillForGloryCharacter::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void AKillForGloryCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void AKillForGloryCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
-}
-
-void AKillForGloryCharacter::TurnAtRate(float Rate)
+void AKFGPlayer::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AKillForGloryCharacter::LookUpAtRate(float Rate)
+void AKFGPlayer::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AKillForGloryCharacter::MoveForward(float Value)
+void AKFGPlayer::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
@@ -118,7 +96,7 @@ void AKillForGloryCharacter::MoveForward(float Value)
 	}
 }
 
-void AKillForGloryCharacter::MoveRight(float Value)
+void AKFGPlayer::MoveRight(float Value)
 {
 	if ( (Controller != NULL) && (Value != 0.0f) )
 	{
