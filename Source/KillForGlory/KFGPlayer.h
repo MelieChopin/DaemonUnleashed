@@ -59,4 +59,40 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//// CONTENT
+public:
+
+	//// ANIM
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* combo1Anim;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* rollAnim;
+	////
+
+	//// PLAYER STAT
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	int maxLife = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	float rollDist = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	float rollSpeed = 0;
+	
+	int currentLife = 0;
+	////
+
+	//// EVENT
+	void Roll(); //Input Roll Event
+
+	UFUNCTION(BlueprintCallable)
+	void RollStart();
+	UFUNCTION(BlueprintCallable)
+	void RollEnd();
+
+	void Attack(); //Input Attack Event
+	////
+
+	bool isRolling = false;
+	
 };
