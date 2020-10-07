@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "KFGPlayer.generated.h"
+
+enum class EPlayerState {NONE, ATTACK, ROLL };
 
 UCLASS(config=Game)
 class AKFGPlayer : public ACharacter
@@ -66,6 +70,10 @@ public:
 	//// ANIM
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* combo1Anim;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* combo2Anim;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* combo3Anim;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* rollAnim;
@@ -81,6 +89,11 @@ public:
 	
 	int currentLife = 0;
 	////
+	
+	////
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
+	UBoxComponent* attackHitBox;
+	////
 
 	//// EVENT
 	void Roll(); //Input Roll Event
@@ -90,9 +103,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RollEnd();
 
+	UFUNCTION(BlueprintCallable)
+	void AttackLaunch();
+	UFUNCTION(BlueprintCallable)
+	void AttackReset();
+	UFUNCTION(BlueprintCallable)
+	void EnableAttackHitBox();
+	UFUNCTION(BlueprintCallable)
+	void DisableAttackHitBox();
+
 	void Attack(); //Input Attack Event
+	
+	UFUNCTION()
+    void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+    						int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	////
 
 	bool isRolling = false;
-	
+	bool isAttacking = false;
+	bool bufferAttack = false;
+	UPROPERTY(BlueprintReadWrite)
+	bool recoverAttack = false;
+	int attackNum = 0;
+
+	EPlayerState playerState = EPlayerState::NONE;
+
+	void changePlayerState(EPlayerState newPlayerState);
 };

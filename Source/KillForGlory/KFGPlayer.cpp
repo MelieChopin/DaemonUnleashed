@@ -47,6 +47,10 @@ AKFGPlayer::AKFGPlayer()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	attackHitBox = CreateDefaultSubobject<UBoxComponent>("AttackHitBox");
+	attackHitBox->SetupAttachment(RootComponent);
+	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayer::OnAttackHitBoxBeginOverlap);
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -90,6 +94,12 @@ void AKFGPlayer::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
+		// Cancel attack anim if player is in recover time
+		if(recoverAttack)
+		{
+			StopAnimMontage(GetCurrentMontage());
+			AttackReset();
+		}
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -102,8 +112,14 @@ void AKFGPlayer::MoveForward(float Value)
 
 void AKFGPlayer::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ( (Controller != NULL) && (Value != 0.0f))
 	{
+		// Cancel attack anim if player is in recover time
+		if(recoverAttack)
+		{
+			StopAnimMontage(GetCurrentMontage());
+			AttackReset();
+		}
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -126,15 +142,104 @@ void AKFGPlayer::Roll()
 
 void AKFGPlayer::RollStart()
 {
+	changePlayerState(EPlayerState::ROLL);
 	isRolling = true;
 }
 
 void AKFGPlayer::RollEnd()
 {
+	playerState = EPlayerState::NONE;
 	isRolling = false;
 }
 
 void AKFGPlayer::Attack()
 {
 	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Attack");
+	
+	bufferAttack = true;
+
+	if(!isAttacking && !isRolling)
+	{
+		attackNum = 0;
+		isAttacking = true;
+		changePlayerState(EPlayerState::ATTACK);
+		AttackLaunch();
+	}
+	else if(isAttacking && recoverAttack)
+		AttackLaunch();
+}
+
+void AKFGPlayer::AttackLaunch()
+{
+	if(!bufferAttack)
+		return;
+	
+	UAnimMontage* animToPlay = nullptr;
+
+	bufferAttack = false;
+	recoverAttack = false;
+	
+	switch (attackNum)
+	{
+		case 0:
+			animToPlay = combo1Anim;
+			break;
+		case 1:
+			animToPlay = combo2Anim;
+			break;
+		case 2:
+			animToPlay = combo3Anim;
+			break;
+		default:
+			break;
+	}
+
+	if(animToPlay != nullptr)
+		PlayAnimMontage(animToPlay);
+
+	attackNum = attackNum < 2 ? attackNum+1 : 0;
+}
+
+void AKFGPlayer::AttackReset()
+{
+	playerState = EPlayerState::NONE;
+
+	bufferAttack = false;
+	isAttacking = false;
+	recoverAttack = false;
+	attackNum = 0;
+}
+
+
+void AKFGPlayer::EnableAttackHitBox()
+{
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AKFGPlayer::DisableAttackHitBox()
+{
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AKFGPlayer::changePlayerState(EPlayerState newPlayerState)
+{
+	if(playerState == newPlayerState)
+		return;
+	
+	switch (playerState)
+	{
+	case EPlayerState::ATTACK:
+		AttackReset(); break;
+	case EPlayerState::ROLL:
+		RollEnd(); break;
+	default: ;
+	}
+
+	playerState = newPlayerState;
+}
+
+void AKFGPlayer::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
 }
