@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -68,6 +69,9 @@ void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("TurnRate", this, &AKFGPlayer::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AKFGPlayer::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Roll", IE_Pressed,this, &AKFGPlayer::Roll);
+	PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayer::Attack);
 }
 
 void AKFGPlayer::TurnAtRate(float Rate)
@@ -109,4 +113,28 @@ void AKFGPlayer::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AKFGPlayer::Roll()
+{
+	if(isRolling)
+		return;
+    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Roll");
+	PlayAnimMontage(rollAnim);
+}
+
+
+void AKFGPlayer::RollStart()
+{
+	isRolling = true;
+}
+
+void AKFGPlayer::RollEnd()
+{
+	isRolling = false;
+}
+
+void AKFGPlayer::Attack()
+{
+	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Attack");
 }
