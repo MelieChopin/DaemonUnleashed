@@ -25,6 +25,8 @@ class AKFGPlayer : public ACharacter
 public:
 	AKFGPlayer();
 
+	virtual void BeginPlay() override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -82,11 +84,7 @@ public:
 	//// PLAYER STAT
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
 	int maxLife = 0;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	float rollDist = 0;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	float rollSpeed = 0;
-	
+	UPROPERTY(BlueprintReadOnly)
 	int currentLife = 0;
 	////
 	

@@ -53,6 +53,13 @@ AKFGPlayer::AKFGPlayer()
 	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void AKFGPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	currentLife = maxLife;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -154,8 +161,7 @@ void AKFGPlayer::RollEnd()
 
 void AKFGPlayer::Attack()
 {
-	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Attack");
-	
+	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,  "Attack");	
 	bufferAttack = true;
 
 	if(!isAttacking && !isRolling)
