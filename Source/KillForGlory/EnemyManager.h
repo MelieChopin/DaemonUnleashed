@@ -3,33 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "EnemyPopcorn.h"
 #include "GameFramework/Character.h"
-#include "EnemyPopcorn.generated.h"
+#include "EnemyManager.generated.h"
 
 UCLASS()
-class KILLFORGLORY_API AEnemyPopcorn : public ACharacter
+class KILLFORGLORY_API AEnemyManager : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AEnemyPopcorn();
+	AEnemyManager();
 
 	UPROPERTY(EditAnywhere)
-	float speedAttack;
-
-	UPROPERTY(EditAnywhere)
-	float damage;
-
-	UPROPERTY(EditAnywhere)
-	float speedMove;
-
-	UPROPERTY(EditAnywhere)
-	float distanceToFocusPlayer;
-
-	UPROPERTY()
-	bool isAttacking;
+	int numberOfEnemies;
 	
+	UPROPERTY(EditAnywhere)
+	float sizeSpawn;
+	
+	UPROPERTY()
+	TArray<AActor*> listEnemies;
+	
+	UPROPERTY(EditAnywhere)
+	class UBlueprint* enemyClass;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
