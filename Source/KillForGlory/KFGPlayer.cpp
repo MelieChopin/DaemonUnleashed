@@ -249,3 +249,9 @@ void AKFGPlayer::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
 {
 	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
 }
+
+void AKFGPlayer::PlayerDamage(int damage)
+{
+	if(currentLife > 0)
+		currentLife -= damage;
+}
