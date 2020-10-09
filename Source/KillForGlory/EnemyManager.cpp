@@ -25,11 +25,10 @@ void AEnemyManager::BeginPlay()
 	yMin = GetActorLocation().Y - sizeSpawn;
 	yMax = yMin + 2 * sizeSpawn;
 	
-	UClass* classref = enemyClass->GeneratedClass;
 	for (int i = 0; i < numberOfEnemies; i++)
 	{
 		FVector newPosition(FMath::RandRange(xMin, xMax), FMath::RandRange(yMin, yMax), GetActorLocation().Z);
-		listEnemies.Add(GetWorld()->SpawnActor<AActor>(classref, newPosition, FRotator::ZeroRotator));
+		listEnemies.Add(GetWorld()->SpawnActor<AActor>(enemyClass.Get(), newPosition, FRotator::ZeroRotator));
 	}	
 }
 

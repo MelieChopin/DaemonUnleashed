@@ -27,7 +27,7 @@ public:
 	TArray<AActor*> listEnemies;
 	
 	UPROPERTY(EditAnywhere)
-	class UBlueprint* enemyClass;
+	TSubclassOf<class AEnemyPopcorn> enemyClass = nullptr;
 
 protected:
 	// Called when the game starts or when spawned
