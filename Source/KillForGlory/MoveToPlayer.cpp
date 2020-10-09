@@ -21,6 +21,7 @@ EBTNodeResult::Type UMoveToPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp
         FVector enemyLocation = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation();
         if ((playerLocation - enemyLocation).Size() < distance)
         {
+            enemy->isFollowingPlayer = true;
             FVector newVector = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation() - playerLocation;
             newVector.Normalize();
             newVector = newVector * 170;
