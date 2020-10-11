@@ -3,9 +3,11 @@
 
 #include "KFGPlayer.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Animation/AnimSequence.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -56,8 +58,26 @@ AKFGPlayer::AKFGPlayer()
 void AKFGPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	timeAnimationHit = hitAnim->SequenceLength / hitAnim->RateScale;
 	
 	currentLife = maxLife;
+}
+
+void AKFGPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, FString::SanitizeFloat(currentLife));
+
+	if (isUntouchable)
+		timeOfUntouchable += DeltaTime;
+
+	if (timeOfUntouchable >= timeUntouchable)
+	{
+		isUntouchable = false;
+		timeOfUntouchable = 0.0f;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -99,7 +119,7 @@ void AKFGPlayer::LookUpAtRate(float Rate)
 
 void AKFGPlayer::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
 	{
 		// Cancel attack anim if player is in recover time
 		if(recoverAttack)
@@ -119,7 +139,7 @@ void AKFGPlayer::MoveForward(float Value)
 
 void AKFGPlayer::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f))
+	if ( (Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
 	{
 		// Cancel attack anim if player is in recover time
 		if(recoverAttack)
@@ -161,6 +181,9 @@ void AKFGPlayer::RollEnd()
 
 void AKFGPlayer::Attack()
 {
+	if (timeOfUntouchable <= timeAnimationHit && isUntouchable)
+		return;
+	
 	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,  "Attack");	
 	bufferAttack = true;
 

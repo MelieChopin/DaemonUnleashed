@@ -3,28 +3,42 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-
-#include "Enemy.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
-#include "EnemyPopcorn.generated.h"
+#include "Enemy.generated.h"
 
 UCLASS()
-class KILLFORGLORY_API AEnemyPopcorn : public AEnemy
+class KILLFORGLORY_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
+	
+
 public:
 	// Sets default values for this character's properties
-	AEnemyPopcorn();
+	AEnemy();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimSequence* attack;
+	UPROPERTY(EditAnywhere)
+    float speedAttack;
+             
+    UPROPERTY(EditAnywhere)
+    float damage;
+             
+    UPROPERTY(EditAnywhere)
+    float speedMove;
+             
+    UPROPERTY(EditAnywhere)
+    float distanceToFocusPlayer;
+             
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool isAttacking;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
-	UBoxComponent* boxCollision;
-	
+	UPROPERTY(EditAnywhere)
+	bool isFollowingPlayer;
+
+	float timeAttack;
+	float changeIsAttacking;
+	float timeAnimAttack;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,8 +50,4 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
 };

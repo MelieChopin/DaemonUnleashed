@@ -6,11 +6,13 @@
 #include "Animation/AnimSequence.h"
 #include "Engine/Engine.h"
 #include "Components/BoxComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 class ASkeletalMeshActor;
 // Sets default values
 AEnemyPopcorn::AEnemyPopcorn()
 {
+	//AEnemy();
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -43,12 +45,6 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	if (isFollowingPlayer)
 		timeAttack += DeltaTime;
 
-	if (timeAttack >= speedAttack)
-	{
-		timeAttack = 0.0f;
-		isAttacking = true;
-	}
-	
 	if (isAttacking)
 	{
 		boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -70,14 +66,15 @@ void AEnemyPopcorn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != this && OtherActor == nullptr)
+	if (OtherActor != this && OtherActor == nullptr || !isAttacking)
 		return;
 
 	AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
 
-	if (player != nullptr)
+	if (player != nullptr && !player->isUntouchable)
 	{
 		player->currentLife -= 1;
+		player->isUntouchable = true;
 		GEngine->AddOnScreenDebugMessage(-3, 1.5f, FColor::Red, TEXT("COLLISION"));
 	}
 }

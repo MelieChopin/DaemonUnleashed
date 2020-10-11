@@ -5,17 +5,16 @@
 #include "Engine/World.h"
 #include "AIController.h"
 #include "GameFramework/PlayerController.h"
-#include "EnemyPopcorn.h"
+#include "Enemy.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
 EBTNodeResult::Type UMoveToPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-    AEnemyPopcorn* enemy = Cast<AEnemyPopcorn>(OwnerComp.GetAIOwner()->GetPawn());
+    AEnemy* enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 
     if(enemy != nullptr)
     {
-       
         float distance = enemy->distanceToFocusPlayer;
         FVector playerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
         FVector enemyLocation = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation();
@@ -31,8 +30,9 @@ EBTNodeResult::Type UMoveToPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp
             FRotator rot = UKismetMathLibrary::FindLookAtRotation(OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation(), playerLocation);
             rot.Pitch = 0;
             OwnerComp.GetAIOwner()->GetPawn()->SetActorRotation(rot);
+            return EBTNodeResult::Succeeded;
         }
     }
     
-    return EBTNodeResult::Succeeded;
+    return EBTNodeResult::Failed;
 }

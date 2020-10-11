@@ -55,10 +55,15 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	UPROPERTY(BlueprintReadOnly)
+	float timeOfUntouchable = 0.0f;
+
+	float timeAnimationHit;
+	
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -67,9 +72,18 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//// CONTENT
-public:
 
+	//// UNTOUCHABLE
+	UPROPERTY(EditAnywhere)
+	float timeUntouchable;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool isUntouchable = false;
+	////
+	
 	//// ANIM
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimSequence* hitAnim;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* combo1Anim;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
@@ -127,4 +141,6 @@ public:
 	EPlayerState playerState = EPlayerState::NONE;
 
 	void changePlayerState(EPlayerState newPlayerState);
+
+	virtual void Tick(float DeltaTime) override;
 };
