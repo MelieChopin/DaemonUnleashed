@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/Character.h"
+
 #include "CoreMinimal.h"
 
-#include "Components/BoxComponent.h"
-#include "GameFramework/Character.h"
 #include "KFGPlayer.generated.h"
 
 enum class EPlayerState {NONE, ATTACK, ROLL };
@@ -69,6 +71,27 @@ public:
 	//// CONTENT
 public:
 
+	//// WALLJUMp
+	bool isFreeze = false;
+	float timeForWallJump = 0.0f;
+	FVector normal;
+	UPROPERTY(EditAnywhere, Category=WallJump)
+    float timeBeforeFalling;
+    UPROPERTY(EditAnywhere, Category=WallJump)
+    float speedFriction;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
+	USphereComponent* wallJumpSphereCollision;
+
+	UFUNCTION()
+    void OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+    void OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
+    						class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	///
+
+	
 	//// ANIM
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* combo1Anim;
@@ -115,6 +138,11 @@ public:
 	UFUNCTION()
     void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
     						int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	void Jumping();
 	////
 	
 	UFUNCTION(BlueprintCallable)

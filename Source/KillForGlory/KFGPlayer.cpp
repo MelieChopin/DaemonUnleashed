@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "KFGPlayer.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
+
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -10,12 +9,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AKFGPlayer
 
 AKFGPlayer::AKFGPlayer()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -51,13 +52,36 @@ AKFGPlayer::AKFGPlayer()
 	attackHitBox->SetupAttachment(RootComponent);
 	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayer::OnAttackHitBoxBeginOverlap);
 	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	wallJumpSphereCollision = CreateDefaultSubobject<USphereComponent>("WallJumpSphereCollision");
+	wallJumpSphereCollision->SetupAttachment(RootComponent);
+    wallJumpSphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayer::OnWallJumpBeginOverlap);
+	
 }
 
 void AKFGPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	wallJumpSphereCollision->OnComponentEndOverlap.AddDynamic(this, &AKFGPlayer::OnWallJumpEndOverlap);
 	currentLife = maxLife;
+}
+
+void AKFGPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (isFreeze)
+	{
+		timeForWallJump += DeltaTime;
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->Velocity = FVector(0, 0, -speedFriction);
+		if (timeForWallJump >= timeBeforeFalling)
+		{
+			GetCharacterMovement()->GravityScale = 1.0f;
+			isFreeze = false;
+			timeForWallJump = 0.0f;
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,7 +91,7 @@ void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AKFGPlayer::Jumping);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AKFGPlayer::MoveForward);
@@ -83,6 +107,19 @@ void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("Roll", IE_Pressed,this, &AKFGPlayer::Roll);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayer::Attack);
+}
+
+void AKFGPlayer::Jumping()
+{
+	if (isFreeze)
+	{
+		GetCharacterMovement()->GravityScale = 1.0f;
+		GetCharacterMovement()->Velocity = FVector(normal * FVector(400, 400, 0) + FVector(0, 0, 800));
+		isFreeze = false;
+		return;
+	}
+	
+	Jump();
 }
 
 void AKFGPlayer::TurnAtRate(float Rate)
@@ -254,4 +291,35 @@ void AKFGPlayer::PlayerDamage(int damage)
 {
 	if(currentLife > 0)
 		currentLife -= damage;
+}
+
+
+void AKFGPlayer::OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor != this && OtherActor->Tags[0] != "WallJump")
+		return;
+
+	FCollisionQueryParams TraceParams;
+	FHitResult hit;
+
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100, ECC_PhysicsBody, TraceParams);
+
+	if (hit.GetActor())
+		normal = hit.Normal;
+
+	if (GetMovementComponent()->IsFalling())
+	{
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->Velocity = FVector(0, 0, -speedFriction);
+		isFreeze = true;
+	}
+}
+
+void AKFGPlayer::OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
+				class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	GetCharacterMovement()->GravityScale = 1.0f;
+	isFreeze = false;
+	timeForWallJump = 0.0f;
 }
