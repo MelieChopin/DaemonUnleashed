@@ -18,6 +18,7 @@ public:
 	AKFGPlayerHuman();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	
 	UPROPERTY(EditAnywhere, Category= Forme)
 	TSubclassOf<class AKFGPlayerDeamon> deamonFormClass = nullptr;
@@ -72,10 +73,31 @@ public:
 
 	void Attack(); //Input Attack Event
 	void TransformToDeamon();
+	void Jumping();
 	
 	UFUNCTION()
     void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	////
+
+	//// WALLJUMp
+	bool isFreeze = false;
+	float timeForWallJump = 0.0f;
+	FVector normal;
+	UPROPERTY(EditAnywhere, Category=WallJump)
+	float timeBeforeFalling;
+	UPROPERTY(EditAnywhere, Category=WallJump)
+	float speedFriction;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
+	USphereComponent* wallJumpSphereCollision;
+
+	UFUNCTION()
+    void OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+    void OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
+                            class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	////
 	
 	bool isRolling = false;

@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/Character.h"
+
 #include "CoreMinimal.h"
 
-#include "Components/BoxComponent.h"
-#include "GameFramework/Character.h"
 #include "KFGPlayer.generated.h"
 
 enum class EPlayerState {NONE, ATTACK, ROLL };
@@ -68,13 +70,13 @@ public:
 
 	//// CONTENT
 public:
-
+	
 	//// PLAYER STAT
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
 	int maxLife = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int currentLife = 0;
-	////
+	////	
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerDamage(int damage);
