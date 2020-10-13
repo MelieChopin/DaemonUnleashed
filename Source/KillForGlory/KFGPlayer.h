@@ -14,7 +14,7 @@ UCLASS(config=Game)
 class AKFGPlayer : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -38,10 +38,10 @@ public:
 protected:
 
 	/** Called for forwards/backward input */
-	void MoveForward(float Value);
+	virtual void MoveForward(float Value);
 
 	/** Called for side to side input */
-	void MoveRight(float Value);
+	virtual void MoveRight(float Value);
 
 	/** 
 	 * Called via input to turn at a given rate. 
@@ -69,18 +69,6 @@ public:
 	//// CONTENT
 public:
 
-	//// ANIM
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo1Anim;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo2Anim;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo3Anim;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* rollAnim;
-	////
-
 	//// PLAYER STAT
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
 	int maxLife = 0;
@@ -88,46 +76,10 @@ public:
 	int currentLife = 0;
 	////
 	
-	////
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
-	UBoxComponent* attackHitBox;
-	////
-
-	//// EVENT
-	void Roll(); //Input Roll Event
-
-	UFUNCTION(BlueprintCallable)
-	void RollStart();
-	UFUNCTION(BlueprintCallable)
-	void RollEnd();
-
-	UFUNCTION(BlueprintCallable)
-	void AttackLaunch();
-	UFUNCTION(BlueprintCallable)
-	void AttackReset();
-	UFUNCTION(BlueprintCallable)
-	void EnableAttackHitBox();
-	UFUNCTION(BlueprintCallable)
-	void DisableAttackHitBox();
-
-	void Attack(); //Input Attack Event
-	
-	UFUNCTION()
-    void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-    						int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	////
-	
 	UFUNCTION(BlueprintCallable)
 	void PlayerDamage(int damage);
 
-	bool isRolling = false;
-	bool isAttacking = false;
-	bool bufferAttack = false;
-	UPROPERTY(BlueprintReadWrite)
-	bool recoverAttack = false;
-	int attackNum = 0;
 
 	EPlayerState playerState = EPlayerState::NONE;
-
-	void changePlayerState(EPlayerState newPlayerState);
+	
 };

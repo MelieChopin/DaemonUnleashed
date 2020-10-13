@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "KFGPlayer.h"
 #include "GameFramework/GameModeBase.h"
 #include "KFGGameMode.generated.h"
 
@@ -14,7 +16,7 @@ class KILLFORGLORY_API AKFGGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	AKFGGameMode();
 	
 };

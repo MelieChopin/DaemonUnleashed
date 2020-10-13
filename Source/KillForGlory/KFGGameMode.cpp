@@ -4,12 +4,14 @@
 #include "KFGGameMode.h"
 
 #include "UObject/ConstructorHelpers.h"
+#include "KFGPlayer.h"
 
 AKFGGameMode::AKFGGameMode()
 {
-    static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Actor/Player_Blueprint"));
+    static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/Actor/PlayerHuman_Blueprint"));
     if (PlayerPawnBPClass.Class != NULL)
     {
         DefaultPawnClass = PlayerPawnBPClass.Class;
     }
+    
 }
