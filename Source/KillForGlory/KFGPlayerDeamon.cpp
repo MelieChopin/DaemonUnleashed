@@ -9,6 +9,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "Engine/Engine.h"
+
+AKFGPlayerDeamon::AKFGPlayerDeamon()
+{
+	attackHitBox = CreateDefaultSubobject<UBoxComponent>("AttackHitBox");
+    attackHitBox->SetupAttachment(RootComponent);
+	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap);
+
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AKFGPlayerDeamon::OnHit);
+}
 
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
 {
@@ -16,11 +28,75 @@ void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
         humanForm = _humanForm;
 }
 
+void AKFGPlayerDeamon::Tick(float DeltaTime) 
+{
+	Super::Tick(DeltaTime);
+
+	if (playerState == EPlayerState::ROLL)
+		Charge();
+
+}
+
 void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerDeamon::TransformToHuman);
+    PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+    PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed, this, &AKFGPlayerDeamon::BeginCharge);
+    PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AKFGPlayerDeamon::Attack);
     //Call parent
     Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AKFGPlayerDeamon::BeginCharge()
+{
+	if (playerState == EPlayerState::ROLL)
+		return;
+
+	beginLocation = GetActorLocation();
+
+	forwardVector = GetActorForwardVector() * 200;
+	GetCharacterMovement()->Velocity = forwardVector;
+
+	playerState = EPlayerState::ROLL;
+	currentDistance = 0.0f;
+	yawRate = GetCharacterMovement()->RotationRate.Yaw;
+	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
+    GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("BEGINCHARGE"));
+}
+
+void AKFGPlayerDeamon::Charge()
+{
+	GetCharacterMovement()->Velocity = GetVelocity() + FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
+	forwardVector = FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
+
+	currentDistance += (beginLocation - GetActorLocation()).Size();
+	beginLocation = GetActorLocation();
+	if (currentDistance >= distanceMax)
+		EndCharge();
+}
+
+void AKFGPlayerDeamon::EndCharge()
+{
+	GetCharacterMovement()->RotationRate = FRotator(0, yawRate, 0);
+	playerState = EPlayerState::NONE;
+	GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("ENDCHARGE"));
+}
+
+void AKFGPlayerDeamon::Attack()
+{
+    GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("ATTACK"));
+}
+
+void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-3, 1, FColor::Blue, "HIT");
+}
+
+void AKFGPlayerDeamon::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
+				UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	GEngine->AddOnScreenDebugMessage(-5, 1, FColor::Red, "HIT");
 }
 
 void AKFGPlayerDeamon::TransformToHuman()
@@ -40,3 +116,5 @@ void AKFGPlayerDeamon::TransformToHuman()
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
     }
 }
+
+

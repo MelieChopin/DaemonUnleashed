@@ -72,7 +72,7 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
 
 void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-    PlayerInputComponent->BindAction("Roll", IE_Pressed,this, &AKFGPlayerHuman::Roll);
+    PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed,this, &AKFGPlayerHuman::Roll);
     PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayerHuman::Attack);
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerHuman::TransformToDeamon);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AKFGPlayerHuman::Jumping);
