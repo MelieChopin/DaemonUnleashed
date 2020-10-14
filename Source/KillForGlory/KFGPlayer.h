@@ -2,15 +2,13 @@
 
 #pragma once
 
-#include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 
 #include "CoreMinimal.h"
 
 #include "KFGPlayer.generated.h"
 
-enum class EPlayerState {NONE, ATTACK, ROLL };
+enum class EPlayerState {NONE, ATTACK, ROLL, SPECIAL};
 
 UCLASS(config=Game)
 class AKFGPlayer : public ACharacter

@@ -4,14 +4,12 @@
 #include "KFGPlayerHuman.h"
 
 #include "KFGPlayerDeamon.h"
-#include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/SpringArmComponent.h"
 
 
 AKFGPlayerHuman::AKFGPlayerHuman()
@@ -24,6 +22,10 @@ AKFGPlayerHuman::AKFGPlayerHuman()
     wallJumpSphereCollision = CreateDefaultSubobject<USphereComponent>("WallJumpSphereCollision");
     wallJumpSphereCollision->SetupAttachment(RootComponent);
     wallJumpSphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerHuman::OnWallJumpBeginOverlap);
+
+    specialHitBox = CreateDefaultSubobject<UBoxComponent>("SpecialHitBox");
+    specialHitBox->SetupAttachment(RootComponent);
+    specialHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 
@@ -53,6 +55,19 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
             timeForWallJump = 0.0f;
         }
     }
+
+    if(currentCooldownSpecialAttack > 0 && playerState == EPlayerState::NONE)
+    {
+        currentCooldownSpecialAttack -= DeltaTime;
+    }
+
+    if(playerState == EPlayerState::SPECIAL)
+    {
+        //TArray<AKFGEnemy> overlappedEnemyList;
+        //specialHitBox->GetOverlappingActors(overlappedEnemyList,TSubclassOf<AKFGEnemy>());
+        
+        //SpecialActorOverlapped(overlappedEnemyList);
+    }
 }
 
 void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -61,6 +76,7 @@ void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInp
     PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayerHuman::Attack);
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerHuman::TransformToDeamon);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AKFGPlayerHuman::Jumping);
+    PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AKFGPlayerHuman::Special);
     //Call parent
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
@@ -76,9 +92,8 @@ void AKFGPlayerHuman::MoveForward(float Value)
             StopAnimMontage(GetCurrentMontage());
             AttackReset();
         }
+        Super::MoveForward(Value);
     }
-    
-    Super::MoveForward(Value);
 }
 
 void AKFGPlayerHuman::MoveRight(float Value)
@@ -91,13 +106,13 @@ void AKFGPlayerHuman::MoveRight(float Value)
             StopAnimMontage(GetCurrentMontage());
             AttackReset();
         }
+        Super::MoveRight(Value);
     }
-    Super::MoveRight(Value);
 }
 
 void AKFGPlayerHuman::Roll()
 {
-    if(isRolling)
+    if(playerState == EPlayerState::ROLL)
         return;
     
     PlayAnimMontage(rollAnim);
@@ -106,13 +121,11 @@ void AKFGPlayerHuman::Roll()
 void AKFGPlayerHuman::RollStart()
 {
     changePlayerState(EPlayerState::ROLL);
-    isRolling = true;
 }
 
 void AKFGPlayerHuman::RollEnd()
 {
     playerState = EPlayerState::NONE;
-    isRolling = false;
 }
 
 void AKFGPlayerHuman::TransformToDeamon()
@@ -125,7 +138,7 @@ void AKFGPlayerHuman::TransformToDeamon()
         SetActorHiddenInGame(true);
         SetActorEnableCollision(false);
         APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-        FVector camPosition = cameraManager->GetCameraLocation();
+        //FVector camPosition = cameraManager->GetCameraLocation();
         FRotator camRotation = cameraManager->GetCameraRotation();
         FRotator playerRotation = GetActorRotation();
         GetController()->Possess(deamonForm);
@@ -138,14 +151,13 @@ void AKFGPlayerHuman::Attack()
 {
     bufferAttack = true;
 
-    if(!isAttacking && !isRolling)
+    if(playerState != EPlayerState::ATTACK && playerState != EPlayerState::ROLL)
     {
         attackNum = 0;
-        isAttacking = true;
         changePlayerState(EPlayerState::ATTACK);
         AttackLaunch();
     }
-    else if(isAttacking && recoverAttack)
+    else if(playerState == EPlayerState::ATTACK && playerState == EPlayerState::ROLL)
         AttackLaunch();
 }
 
@@ -185,9 +197,38 @@ void AKFGPlayerHuman::AttackReset()
     playerState = EPlayerState::NONE;
 
     bufferAttack = false;
-    isAttacking = false;
     recoverAttack = false;
     attackNum = 0;
+}
+
+void AKFGPlayerHuman::Special()
+{
+    if(currentCooldownSpecialAttack <= 0 && (playerState == EPlayerState::NONE || recoverAttack))
+    {
+        PlayAnimMontage(specialAttack);
+        currentCooldownSpecialAttack = cooldownSpecialAttack;
+        changePlayerState(EPlayerState::SPECIAL);
+    }
+}
+
+void AKFGPlayerHuman::EnableSpecial()
+{
+    specialHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AKFGPlayerHuman::DisableSpecial()
+{
+    specialHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AKFGPlayerHuman::SpecialEnd()
+{
+    changePlayerState(EPlayerState::NONE);
+}
+
+void AKFGPlayerHuman::SpecialActorOverlapped()
+{
+    
 }
 
 void AKFGPlayerHuman::EnableAttackHitBox()
@@ -203,7 +244,7 @@ void AKFGPlayerHuman::DisableAttackHitBox()
 void AKFGPlayerHuman::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    //GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
+    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
 }
 
 void AKFGPlayerHuman::Jumping()
@@ -260,6 +301,8 @@ void AKFGPlayerHuman::changePlayerState(EPlayerState newPlayerState)
         AttackReset(); break;
     case EPlayerState::ROLL:
         RollEnd(); break;
+    case EPlayerState::SPECIAL: break;
+    case EPlayerState::NONE: break;
     default: ;
     }
 

@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "KFGPlayer.h"
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
+
 #include "KFGPlayerHuman.generated.h"
 
 /**
@@ -46,11 +49,16 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* rollAnim;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* specialAttack;
 	////
 
 	//// Collider
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	UBoxComponent* attackHitBox;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
+	UBoxComponent* specialHitBox;
 	////
 	
 	//// Event
@@ -65,6 +73,13 @@ public:
     void AttackLaunch();
 	UFUNCTION(BlueprintCallable)
     void AttackReset();
+
+	UFUNCTION(BlueprintCallable)
+	void EnableSpecial();
+	UFUNCTION(BlueprintCallable)
+    void DisableSpecial();
+	UFUNCTION(BlueprintCallable)
+    void SpecialEnd();
 	
 	UFUNCTION(BlueprintCallable)
     void EnableAttackHitBox();
@@ -72,6 +87,7 @@ public:
     void DisableAttackHitBox();
 
 	void Attack(); //Input Attack Event
+	void Special();
 	void TransformToDeamon();
 	void Jumping();
 	
@@ -99,13 +115,23 @@ public:
     void OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	////
+
+	//// PlayerStat
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	int attackDamage = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	int specialDamage = 0;
+	////
 	
-	bool isRolling = false;
-	bool isAttacking = false;
 	bool bufferAttack = false;
 	UPROPERTY(BlueprintReadWrite)
 	bool recoverAttack = false;
 	int attackNum = 0;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
+	float cooldownSpecialAttack = 0;
+	float currentCooldownSpecialAttack = 0;
+	void SpecialActorOverlapped(); // Called every frame during special attack
 	
 	void changePlayerState(EPlayerState newPlayerState);
 };
