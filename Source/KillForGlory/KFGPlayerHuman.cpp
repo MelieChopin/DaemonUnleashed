@@ -52,7 +52,7 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
 
 void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-    PlayerInputComponent->BindAction("Roll", IE_Pressed,this, &AKFGPlayerHuman::Roll);
+    PlayerInputComponent->BindAction("Roll/Charge", IE_Pressed,this, &AKFGPlayerHuman::Roll);
     PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayerHuman::Attack);
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerHuman::TransformToDeamon);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AKFGPlayerHuman::Jumping);
@@ -186,7 +186,7 @@ void AKFGPlayerHuman::DisableAttackHitBox()
 void AKFGPlayerHuman::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    //GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
+    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
 }
 
 void AKFGPlayerHuman::Jumping()
