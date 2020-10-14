@@ -4,7 +4,6 @@
 #include "KFGGameMode.h"
 
 #include "UObject/ConstructorHelpers.h"
-#include "KFGPlayer.h"
 
 AKFGGameMode::AKFGGameMode()
 {
@@ -13,5 +12,11 @@ AKFGGameMode::AKFGGameMode()
     {
         DefaultPawnClass = PlayerPawnBPClass.Class;
     }
-    
+}
+
+
+void AKFGGameMode::BeginPlay()
+{
+    Super::BeginPlay();
+    currentLife = maxLife;
 }

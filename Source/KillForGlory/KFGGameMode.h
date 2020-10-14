@@ -18,5 +18,14 @@ class KILLFORGLORY_API AKFGGameMode : public AGameModeBase
 
 public:	
 	AKFGGameMode();
+
+	virtual void BeginPlay() override;
+
+	//// PLAYER STAT
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	int maxLife = 0;
+	UPROPERTY(BlueprintReadOnly)
+	int currentLife = 0;
+	////
 	
 };

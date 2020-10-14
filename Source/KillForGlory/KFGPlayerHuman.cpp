@@ -4,11 +4,14 @@
 #include "KFGPlayerHuman.h"
 
 #include "KFGPlayerDeamon.h"
+#include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 AKFGPlayerHuman::AKFGPlayerHuman()
@@ -29,7 +32,9 @@ void AKFGPlayerHuman::BeginPlay()
     Super::BeginPlay();
     wallJumpSphereCollision->OnComponentEndOverlap.AddDynamic(this, &AKFGPlayerHuman::OnWallJumpEndOverlap);
     deamonForm = GetWorld()->SpawnActor<AKFGPlayerDeamon>(deamonFormClass.Get(), GetActorLocation(), FRotator::ZeroRotator);
-    deamonForm->SetHumanForm(this); 
+    deamonForm->SetHumanForm(this);
+    deamonForm->SetActorHiddenInGame(true);
+    deamonForm->SetActorEnableCollision(false);
 }
 
 void AKFGPlayerHuman::Tick(float DeltaTime)
@@ -112,9 +117,21 @@ void AKFGPlayerHuman::RollEnd()
 
 void AKFGPlayerHuman::TransformToDeamon()
 {
-    GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"Transform");
     if(deamonForm != nullptr)
+    {
+        deamonForm->SetActorTransform(GetActorTransform());
+        deamonForm->SetActorEnableCollision(true);
+        deamonForm->SetActorHiddenInGame(false);
+        SetActorHiddenInGame(true);
+        SetActorEnableCollision(false);
+        APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+        FVector camPosition = cameraManager->GetCameraLocation();
+        FRotator camRotation = cameraManager->GetCameraRotation();
+        FRotator playerRotation = GetActorRotation();
         GetController()->Possess(deamonForm);
+        deamonForm->GetCharacterMovement()->Velocity = GetVelocity();
+        GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
+    }
 }
 
 void AKFGPlayerHuman::Attack()

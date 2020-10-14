@@ -69,18 +69,14 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	//// CONTENT
-public:
-	
-	//// PLAYER STAT
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	int maxLife = 0;
-	UPROPERTY(BlueprintReadOnly)
-	int currentLife = 0;
-	////	
+public:	
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerDamage(int damage);
 
+	//// Player Stat
+	int* currentLife = nullptr; // Point on currentLife KFGGameMode
+	////
 
 	EPlayerState playerState = EPlayerState::NONE;
 	

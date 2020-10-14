@@ -2,6 +2,8 @@
 
 #include "KFGPlayer.h"
 
+
+#include "KFGGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AKFGPlayer
@@ -52,7 +55,10 @@ AKFGPlayer::AKFGPlayer()
 void AKFGPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	currentLife = maxLife;
+	currentLife = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->currentLife;
+
+	if(currentLife == nullptr)
+		EndPlay(EEndPlayReason::Quit);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -119,6 +125,6 @@ void AKFGPlayer::MoveRight(float Value)
 
 void AKFGPlayer::PlayerDamage(int damage)
 {
-	if(currentLife > 0)
-		currentLife -= damage;
+	if(*currentLife > 0)
+		*currentLife -= damage;
 }

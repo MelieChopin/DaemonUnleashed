@@ -3,8 +3,12 @@
 
 #include "KFGPlayerDeamon.h"
 #include "KFGPlayerHuman.h"
+#include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/SpringArmComponent.h"
 
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
 {
@@ -22,5 +26,17 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 void AKFGPlayerDeamon::TransformToHuman()
 {
     if(humanForm != nullptr)
+    {
+        humanForm->SetActorEnableCollision(true);
+        humanForm->SetActorHiddenInGame(false);
+        humanForm->SetActorTransform(GetActorTransform());
+        SetActorHiddenInGame(true);
+        SetActorEnableCollision(false);
+        APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+        FRotator camRotation = cameraManager->GetCameraRotation();
+        FRotator playerRotation = GetActorRotation();
         GetController()->Possess(humanForm);
+        humanForm->GetCharacterMovement()->Velocity = GetVelocity();
+        GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
+    }
 }
