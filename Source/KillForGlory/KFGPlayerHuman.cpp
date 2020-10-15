@@ -157,7 +157,7 @@ void AKFGPlayerHuman::Attack()
         changePlayerState(EPlayerState::ATTACK);
         AttackLaunch();
     }
-    else if(playerState == EPlayerState::ATTACK && playerState == EPlayerState::ROLL)
+    else if(playerState == EPlayerState::ATTACK && recoverAttack)
         AttackLaunch();
 }
 
