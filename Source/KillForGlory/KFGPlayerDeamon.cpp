@@ -2,6 +2,9 @@
 
 
 #include "KFGPlayerDeamon.h"
+
+#include <xkeycheck.h>
+
 #include "KFGPlayerHuman.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
@@ -18,6 +21,8 @@ AKFGPlayerDeamon::AKFGPlayerDeamon()
     attackHitBox->SetupAttachment(RootComponent);
 	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap);
 	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 }
 
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
@@ -47,7 +52,7 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 void AKFGPlayerDeamon::BeginCharge()
 {
-	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling())
+	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || playerState == EPlayerState::ATTACK)
 		return;
 
 	beginLocation = GetActorLocation();
@@ -57,7 +62,6 @@ void AKFGPlayerDeamon::BeginCharge()
 
 	playerState = EPlayerState::ROLL;
 	currentDistance = 0.0f;
-	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
 	isCharging = true;
     GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("BEGINCHARGE"));
@@ -93,7 +97,7 @@ void AKFGPlayerDeamon::Attack()
 		AttackLaunch();
 	}
 	else if(playerState == EPlayerState::ATTACK && playerState == EPlayerState::ROLL)
-		AttackLaunch();
+		AttackLaunch();	
 }
 
 void AKFGPlayerDeamon::AttackLaunch()
@@ -158,6 +162,8 @@ void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)
 	{
 	case EPlayerState::ATTACK:
 		AttackReset(); break;
+	case EPlayerState::ROLL:
+        EndCharge(); break;
 	case EPlayerState::SPECIAL: break;
 	case EPlayerState::NONE: break;
 	default: ;
