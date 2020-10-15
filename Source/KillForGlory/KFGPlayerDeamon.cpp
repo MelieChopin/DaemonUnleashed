@@ -50,17 +50,48 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void AKFGPlayerDeamon::MoveForward(float Value)
+{
+	// Cancel attack anim if player is in recover time
+	if ( (Controller != NULL) && (Value != 0.0f))
+	{
+		if(recoverAttack)
+		{
+			StopAnimMontage(GetCurrentMontage());
+			AttackReset();
+		}
+		Super::MoveForward(Value);
+	}
+}
+
+void AKFGPlayerDeamon::MoveRight(float Value)
+{
+	// Cancel attack anim if player is in recover time
+	if ( (Controller != NULL) && (Value != 0.0f))
+	{
+		if(recoverAttack)
+		{
+			StopAnimMontage(GetCurrentMontage());
+			AttackReset();
+		}
+		Super::MoveRight(Value);
+	}
+}
+
 void AKFGPlayerDeamon::BeginCharge()
 {
-	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || playerState == EPlayerState::ATTACK)
+	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || (playerState == EPlayerState::ATTACK && !recoverAttack))
 		return;
 
+	if(recoverAttack)
+		StopAnimMontage(GetCurrentMontage());
+	changePlayerState(EPlayerState::ROLL);
+	
 	beginLocation = GetActorLocation();
 
 	forwardVector = GetActorForwardVector() * 200;
 	GetCharacterMovement()->Velocity = forwardVector;
 
-	playerState = EPlayerState::ROLL;
 	currentDistance = 0.0f;
 	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
 	isCharging = true;
@@ -96,7 +127,7 @@ void AKFGPlayerDeamon::Attack()
 		changePlayerState(EPlayerState::ATTACK);
 		AttackLaunch();
 	}
-	else if(playerState == EPlayerState::ATTACK && playerState == EPlayerState::ROLL)
+	else if(playerState == EPlayerState::ATTACK && recoverAttack)
 		AttackLaunch();	
 }
 

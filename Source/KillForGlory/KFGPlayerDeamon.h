@@ -29,6 +29,13 @@ protected:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     // End of APawn interface
 
+    /** Called for forwards/backward input */
+    void MoveForward(float Value) override;
+
+    /** Called for side to side input */
+    void MoveRight(float Value) override;
+
+public:
     //// ANIM
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
     UAnimMontage* combo1Anim;
