@@ -7,6 +7,8 @@
 #include "KFGPlayerDeamon.generated.h"
 
 class UBoxComponent;
+
+class USphereComponent;
 /**
  * 
  */
@@ -27,6 +29,13 @@ protected:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     // End of APawn interface
 
+    //// ANIM
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+    UAnimMontage* combo1Anim;
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+    UAnimMontage* combo2Anim;
+    ///
+    
     //// ATTACK
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
     UBoxComponent* attackHitBox;
@@ -35,10 +44,17 @@ protected:
     void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-    void Attack();
+    UFUNCTION(BlueprintCallable)
+    void AttackLaunch();
+    UFUNCTION(BlueprintCallable)
+    void AttackReset();
 
-    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+    UFUNCTION(BlueprintCallable)
+    void EnableAttackHitBox();
+    UFUNCTION(BlueprintCallable)
+    void DisableAttackHitBox();
     
+    void Attack();
     ///
     
 
@@ -52,17 +68,37 @@ protected:
     UPROPERTY(EditAnywhere, Category=Charge)
     float lerpPercent;
 
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Charge)
+    bool isCharging;
+    
     FVector forwardVector;
     FVector beginLocation;
     float currentDistance = 0.0f;
     float yawRate;
 
+    //UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
+    //UBoxComponent* collisionCharge;
+
     void BeginCharge();
     void Charge();
+    UFUNCTION(BlueprintCallable)
     void EndCharge();
     ////
+
+    bool bufferAttack = false;
+    UPROPERTY(BlueprintReadWrite)
+    bool recoverAttack = false;
+    int attackNum = 0;
+
+    //// PlayerStat
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+    int attackDamage = 0;
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+    int specialDamage = 0;
+    ////
+
+    void changePlayerState(EPlayerState newPlayerState);
     
-   
     
     void TransformToHuman();
 };

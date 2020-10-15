@@ -10,7 +10,6 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Components/CapsuleComponent.h"
 #include "Engine/Engine.h"
 
 AKFGPlayerDeamon::AKFGPlayerDeamon()
@@ -18,8 +17,7 @@ AKFGPlayerDeamon::AKFGPlayerDeamon()
 	attackHitBox = CreateDefaultSubobject<UBoxComponent>("AttackHitBox");
     attackHitBox->SetupAttachment(RootComponent);
 	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap);
-
-	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AKFGPlayerDeamon::OnHit);
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
@@ -49,7 +47,7 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 void AKFGPlayerDeamon::BeginCharge()
 {
-	if (playerState == EPlayerState::ROLL)
+	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling())
 		return;
 
 	beginLocation = GetActorLocation();
@@ -61,6 +59,7 @@ void AKFGPlayerDeamon::BeginCharge()
 	currentDistance = 0.0f;
 	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
+	isCharging = true;
     GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("BEGINCHARGE"));
 }
 
@@ -71,7 +70,7 @@ void AKFGPlayerDeamon::Charge()
 
 	currentDistance += (beginLocation - GetActorLocation()).Size();
 	beginLocation = GetActorLocation();
-	if (currentDistance >= distanceMax)
+	if (currentDistance >= distanceMax || GetMovementComponent()->IsFalling())
 		EndCharge();
 }
 
@@ -79,12 +78,69 @@ void AKFGPlayerDeamon::EndCharge()
 {
 	GetCharacterMovement()->RotationRate = FRotator(0, yawRate, 0);
 	playerState = EPlayerState::NONE;
+	isCharging = false;
 	GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("ENDCHARGE"));
 }
 
 void AKFGPlayerDeamon::Attack()
 {
-    GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("ATTACK"));
+	bufferAttack = true;
+
+	if(playerState != EPlayerState::ATTACK && playerState != EPlayerState::ROLL)
+	{
+		attackNum = 0;
+		changePlayerState(EPlayerState::ATTACK);
+		AttackLaunch();
+	}
+	else if(playerState == EPlayerState::ATTACK && playerState == EPlayerState::ROLL)
+		AttackLaunch();
+}
+
+void AKFGPlayerDeamon::AttackLaunch()
+{
+	if(!bufferAttack)
+		return;
+	
+	UAnimMontage* animToPlay = nullptr;
+
+	bufferAttack = false;
+	recoverAttack = false;
+	
+	switch (attackNum)
+	{
+	case 0:
+		animToPlay = combo1Anim;
+		break;
+	case 1:
+		animToPlay = combo2Anim;
+		break;
+	default:
+		break;
+	}
+
+	if(animToPlay != nullptr)
+		PlayAnimMontage(animToPlay);
+
+	attackNum = attackNum < 1 ? attackNum+1 : 0;
+}
+
+void AKFGPlayerDeamon::AttackReset()
+{
+	playerState = EPlayerState::NONE;
+
+	bufferAttack = false;
+	recoverAttack = false;
+	attackNum = 0;
+}
+
+void AKFGPlayerDeamon::EnableAttackHitBox()
+{
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AKFGPlayerDeamon::DisableAttackHitBox()
+{
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -93,11 +149,23 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 	GEngine->AddOnScreenDebugMessage(-3, 1, FColor::Blue, "HIT");
 }
 
-void AKFGPlayerDeamon::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
-				UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)
 {
-	GEngine->AddOnScreenDebugMessage(-5, 1, FColor::Red, "HIT");
+	if(playerState == newPlayerState)
+		return;
+	
+	switch (playerState)
+	{
+	case EPlayerState::ATTACK:
+		AttackReset(); break;
+	case EPlayerState::SPECIAL: break;
+	case EPlayerState::NONE: break;
+	default: ;
+	}
+
+	playerState = newPlayerState;
 }
+
 
 void AKFGPlayerDeamon::TransformToHuman()
 {
