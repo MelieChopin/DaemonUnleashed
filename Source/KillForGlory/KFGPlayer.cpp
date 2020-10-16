@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "KFGPlayer.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#include "Animation/AnimSequence.h"
+
+#include "KFGGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -12,12 +11,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AKFGPlayer
 
 AKFGPlayer::AKFGPlayer()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -49,26 +50,23 @@ AKFGPlayer::AKFGPlayer()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-	attackHitBox = CreateDefaultSubobject<UBoxComponent>("AttackHitBox");
-	attackHitBox->SetupAttachment(RootComponent);
-	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayer::OnAttackHitBoxBeginOverlap);
-	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AKFGPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	timeAnimationHit = hitAnim->SequenceLength / hitAnim->RateScale;
-	
-	currentLife = maxLife;
+	currentLife = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->currentLife;
+
+	if(currentLife == nullptr)
+		EndPlay(EEndPlayReason::Quit);
 }
 
 void AKFGPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, FString::SanitizeFloat(currentLife));
+	//GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, FString::SanitizeFloat(currentLife));
 
 	if (isUntouchable)
 		timeOfUntouchable += DeltaTime;
@@ -87,7 +85,6 @@ void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AKFGPlayer::MoveForward);
@@ -100,9 +97,6 @@ void AKFGPlayer::SetupPlayerInputComponent(class UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("TurnRate", this, &AKFGPlayer::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AKFGPlayer::LookUpAtRate);
-
-	PlayerInputComponent->BindAction("Roll", IE_Pressed,this, &AKFGPlayer::Roll);
-	PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayer::Attack);
 }
 
 void AKFGPlayer::TurnAtRate(float Rate)
@@ -121,12 +115,6 @@ void AKFGPlayer::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
 	{
-		// Cancel attack anim if player is in recover time
-		if(recoverAttack)
-		{
-			StopAnimMontage(GetCurrentMontage());
-			AttackReset();
-		}
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -141,12 +129,6 @@ void AKFGPlayer::MoveRight(float Value)
 {
 	if ( (Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
 	{
-		// Cancel attack anim if player is in recover time
-		if(recoverAttack)
-		{
-			StopAnimMontage(GetCurrentMontage());
-			AttackReset();
-		}
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -158,117 +140,8 @@ void AKFGPlayer::MoveRight(float Value)
 	}
 }
 
-void AKFGPlayer::Roll()
+void AKFGPlayer::PlayerDamage(int damage)
 {
-	if(isRolling)
-		return;
-    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Roll");
-	PlayAnimMontage(rollAnim);
-}
-
-
-void AKFGPlayer::RollStart()
-{
-	changePlayerState(EPlayerState::ROLL);
-	isRolling = true;
-}
-
-void AKFGPlayer::RollEnd()
-{
-	playerState = EPlayerState::NONE;
-	isRolling = false;
-}
-
-void AKFGPlayer::Attack()
-{
-	if (timeOfUntouchable <= timeAnimationHit && isUntouchable)
-		return;
-	
-	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,  "Attack");	
-	bufferAttack = true;
-
-	if(!isAttacking && !isRolling)
-	{
-		attackNum = 0;
-		isAttacking = true;
-		changePlayerState(EPlayerState::ATTACK);
-		AttackLaunch();
-	}
-	else if(isAttacking && recoverAttack)
-		AttackLaunch();
-}
-
-void AKFGPlayer::AttackLaunch()
-{
-	if(!bufferAttack)
-		return;
-	
-	UAnimMontage* animToPlay = nullptr;
-
-	bufferAttack = false;
-	recoverAttack = false;
-	
-	switch (attackNum)
-	{
-		case 0:
-			animToPlay = combo1Anim;
-			break;
-		case 1:
-			animToPlay = combo2Anim;
-			break;
-		case 2:
-			animToPlay = combo3Anim;
-			break;
-		default:
-			break;
-	}
-
-	if(animToPlay != nullptr)
-		PlayAnimMontage(animToPlay);
-
-	attackNum = attackNum < 2 ? attackNum+1 : 0;
-}
-
-void AKFGPlayer::AttackReset()
-{
-	playerState = EPlayerState::NONE;
-
-	bufferAttack = false;
-	isAttacking = false;
-	recoverAttack = false;
-	attackNum = 0;
-}
-
-
-void AKFGPlayer::EnableAttackHitBox()
-{
-	attackHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-}
-
-void AKFGPlayer::DisableAttackHitBox()
-{
-	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AKFGPlayer::changePlayerState(EPlayerState newPlayerState)
-{
-	if(playerState == newPlayerState)
-		return;
-	
-	switch (playerState)
-	{
-	case EPlayerState::ATTACK:
-		AttackReset(); break;
-	case EPlayerState::ROLL:
-		RollEnd(); break;
-	default: ;
-	}
-
-	playerState = newPlayerState;
-}
-
-void AKFGPlayer::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
+	if(*currentLife > 0)
+		*currentLife -= damage;
 }

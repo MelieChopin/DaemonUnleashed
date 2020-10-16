@@ -2,19 +2,19 @@
 
 #pragma once
 
+#include "GameFramework/Character.h"
+
 #include "CoreMinimal.h"
 
-#include "Components/BoxComponent.h"
-#include "GameFramework/Character.h"
 #include "KFGPlayer.generated.h"
 
-enum class EPlayerState {NONE, ATTACK, ROLL };
+enum class EPlayerState {NONE, ATTACK, ROLL, SPECIAL};
 
 UCLASS(config=Game)
 class AKFGPlayer : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -38,10 +38,10 @@ public:
 protected:
 
 	/** Called for forwards/backward input */
-	void MoveForward(float Value);
+	virtual void MoveForward(float Value);
 
 	/** Called for side to side input */
-	void MoveRight(float Value);
+	virtual void MoveRight(float Value);
 
 	/** 
 	 * Called via input to turn at a given rate. 
@@ -80,67 +80,18 @@ public:
 	bool isUntouchable = false;
 	////
 	
-	//// ANIM
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimSequence* hitAnim;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo1Anim;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo2Anim;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* combo3Anim;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* rollAnim;
+	UFUNCTION(BlueprintCallable)
+	void PlayerDamage(int damage);
+
+	//// Player Stat
+	int* currentLife = nullptr; // Point on currentLife KFGGameMode
 	////
-
-	//// PLAYER STAT
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	int maxLife = 0;
-	UPROPERTY(BlueprintReadOnly)
-	int currentLife = 0;
-	////
-	
-	////
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
-	UBoxComponent* attackHitBox;
-	////
-
-	//// EVENT
-	void Roll(); //Input Roll Event
-
-	UFUNCTION(BlueprintCallable)
-	void RollStart();
-	UFUNCTION(BlueprintCallable)
-	void RollEnd();
-
-	UFUNCTION(BlueprintCallable)
-	void AttackLaunch();
-	UFUNCTION(BlueprintCallable)
-	void AttackReset();
-	UFUNCTION(BlueprintCallable)
-	void EnableAttackHitBox();
-	UFUNCTION(BlueprintCallable)
-	void DisableAttackHitBox();
-
-	void Attack(); //Input Attack Event
-	
-	UFUNCTION()
-    void OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-    						int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	////
-
-	bool isRolling = false;
-	bool isAttacking = false;
-	bool bufferAttack = false;
-	UPROPERTY(BlueprintReadWrite)
-	bool recoverAttack = false;
-	int attackNum = 0;
 
 	EPlayerState playerState = EPlayerState::NONE;
 
 	void changePlayerState(EPlayerState newPlayerState);
 
 	virtual void Tick(float DeltaTime) override;
+
 };

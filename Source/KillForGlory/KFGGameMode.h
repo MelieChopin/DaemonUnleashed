@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "KFGPlayer.h"
 #include "GameFramework/GameModeBase.h"
 #include "KFGGameMode.generated.h"
 
@@ -14,7 +16,16 @@ class KILLFORGLORY_API AKFGGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	AKFGGameMode();
+
+	virtual void BeginPlay() override;
+
+	//// PLAYER STAT
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	int maxLife = 0;
+	UPROPERTY(BlueprintReadOnly)
+	int currentLife = 0;
+	////
 	
 };
