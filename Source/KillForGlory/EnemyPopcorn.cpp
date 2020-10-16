@@ -6,6 +6,7 @@
 
 #include "Animation/AnimSequence.h"
 #include "Components/BoxComponent.h"
+#include "Engine/Engine.h"
 
 class AKFGPlayer;
 // Sets default values
@@ -47,10 +48,14 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 
 	if (isAttacking)
 	{
+		if (changeIsAttacking <= 0.1)
+			PlayAnimMontage(attack);
+		GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Blue, FString::SanitizeFloat(timeAttack));
 		boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		changeIsAttacking += DeltaTime;
 		if (changeIsAttacking >= timeAnimAttack)
 		{
+			StopAnimMontage(attack);
 			changeIsAttacking = 0.0f;
 			isAttacking = false;
 		}
@@ -71,7 +76,7 @@ void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 	if (OtherActor != this && OtherActor == nullptr || !isAttacking)
 		return;
 
-		
+	
 }
 
 

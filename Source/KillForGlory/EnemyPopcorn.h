@@ -19,7 +19,7 @@ public:
 	AEnemyPopcorn();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimSequence* attack;
+	UAnimMontage* attack;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	UBoxComponent* boxCollision;

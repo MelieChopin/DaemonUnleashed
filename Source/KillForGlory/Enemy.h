@@ -11,8 +11,6 @@ class KILLFORGLORY_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
-	
-
 public:
 	// Sets default values for this character's properties
 	AEnemy();
@@ -37,7 +35,7 @@ public:
 
 	float timeAttack;
 	float changeIsAttacking;
-	float timeAnimAttack;
+	float timeAnimAttack = 0.6f;
 
 protected:
 	// Called when the game starts or when spawned
