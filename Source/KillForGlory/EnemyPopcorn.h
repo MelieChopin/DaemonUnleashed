@@ -4,12 +4,11 @@
 
 #include "CoreMinimal.h"
 
-
 #include "Enemy.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "EnemyPopcorn.generated.h"
 
+class UBoxComponent;
 UCLASS()
 class KILLFORGLORY_API AEnemyPopcorn : public AEnemy
 {
@@ -24,6 +23,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	UBoxComponent* boxCollision;
+
 	
 protected:
 	// Called when the game starts or when spawned
@@ -37,7 +37,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+    void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

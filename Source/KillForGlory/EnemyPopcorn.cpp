@@ -2,27 +2,27 @@
 
 
 #include "EnemyPopcorn.h"
-#include "KFGPlayer.h"
-#include "Animation/AnimSequence.h"
-#include "Engine/Engine.h"
-#include "Components/BoxComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 
-class ASkeletalMeshActor;
+
+#include "Animation/AnimSequence.h"
+#include "Components/BoxComponent.h"
+
+class AKFGPlayer;
 // Sets default values
 AEnemyPopcorn::AEnemyPopcorn()
 {
 	//AEnemy();
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	isAttacking = false;
 	
 	boxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
 	boxCollision->SetRelativeTransform(FTransform(FQuat(),
-		FVector(136.99176, 0.000168, -20.238766), FVector(1, 1, 1)));
+        FVector(136.99176, 0.000168, -20.238766), FVector(1, 1, 1)));
 	boxCollision->InitBoxExtent(FVector(57, 40, 35));
-    boxCollision->SetupAttachment(RootComponent);
+	boxCollision->SetupAttachment(RootComponent);
+
 }
 
 // Called when the game starts or when spawned
@@ -30,9 +30,9 @@ void AEnemyPopcorn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	timeAnimAttack = attack->SequenceLength / attack->RateScale;
 	boxCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemyPopcorn::OnOverlapBegin);
 	boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 // Called every frame
@@ -55,12 +55,14 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 			isAttacking = false;
 		}
 	}
+
 }
 
 // Called to bind functionality to input
 void AEnemyPopcorn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 }
 
 void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -69,13 +71,7 @@ void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 	if (OtherActor != this && OtherActor == nullptr || !isAttacking)
 		return;
 
-	AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
-
-	if (player != nullptr && !player->isUntouchable)
-	{
-		player->currentLife -= 1;
-		player->isUntouchable = true;
-		GEngine->AddOnScreenDebugMessage(-3, 1.5f, FColor::Red, TEXT("COLLISION"));
-	}
+		
 }
+
 
