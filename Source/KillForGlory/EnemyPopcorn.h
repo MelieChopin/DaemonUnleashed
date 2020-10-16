@@ -36,6 +36,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	////Event
+	UFUNCTION(BlueprintCallable)
+    void EnableAttackHitBox();
+	UFUNCTION(BlueprintCallable)
+    void DisableAttackHitBox();
+	////
+	
 	UFUNCTION()
     void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

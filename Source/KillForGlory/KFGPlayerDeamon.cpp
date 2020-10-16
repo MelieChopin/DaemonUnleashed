@@ -5,6 +5,8 @@
 
 #include <xkeycheck.h>
 
+
+#include "Enemy.h"
 #include "KFGPlayerHuman.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
@@ -182,6 +184,12 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	GEngine->AddOnScreenDebugMessage(-3, 1, FColor::Blue, "HIT");
+	if(OtherActor->ActorHasTag("Enemy"))
+	{
+		AEnemy* enemy = Cast<AEnemy>(OtherActor);
+		if(enemy != nullptr)
+			enemy->EnemyDamage(attackDamage);
+	}
 }
 
 void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)

@@ -19,7 +19,7 @@ bool UCanAttackPlayer::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerC
 
         FVector dist = enemyLocation - playerLocation;
 
-        if (dist.Size() <= 200)
+        if (dist.Size() <= 300)
             return true;
     }
    

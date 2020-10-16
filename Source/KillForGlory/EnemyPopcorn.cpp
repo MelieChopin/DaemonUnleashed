@@ -4,7 +4,10 @@
 #include "EnemyPopcorn.h"
 
 
+
+#include "KFGGameMode.h"
 #include "Animation/AnimSequence.h"
+#include "Chaos/GeometryParticlesfwd.h"
 #include "Components/BoxComponent.h"
 #include "Engine/Engine.h"
 
@@ -19,9 +22,6 @@ AEnemyPopcorn::AEnemyPopcorn()
 	isAttacking = false;
 	
 	boxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
-	boxCollision->SetRelativeTransform(FTransform(FQuat(),
-        FVector(136.99176, 0.000168, -20.238766), FVector(1, 1, 1)));
-	boxCollision->InitBoxExtent(FVector(57, 40, 35));
 	boxCollision->SetupAttachment(RootComponent);
 
 }
@@ -40,8 +40,6 @@ void AEnemyPopcorn::BeginPlay()
 void AEnemyPopcorn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	if (isFollowingPlayer)
 		timeAttack += DeltaTime;
@@ -50,8 +48,7 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	{
 		if (changeIsAttacking <= 0.1)
 			PlayAnimMontage(attack);
-		GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Blue, FString::SanitizeFloat(timeAttack));
-		boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		//GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Blue, FString::SanitizeFloat(timeAttack));
 		changeIsAttacking += DeltaTime;
 		if (changeIsAttacking >= timeAnimAttack)
 		{
@@ -70,12 +67,30 @@ void AEnemyPopcorn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
-void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor != this && OtherActor == nullptr || !isAttacking)
-		return;
 
+void AEnemyPopcorn::EnableAttackHitBox()
+{
+	boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AEnemyPopcorn::DisableAttackHitBox()
+{
+	boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor->ActorHasTag("Player") && OtherComp->ComponentHasTag("Body"))
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red, "EnemyHit");
+		AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
+		if(player != nullptr)
+			player->PlayerDamage(damage);
+	}
+	
+	if (OtherActor == nullptr || !isAttacking)
+		return;
 	
 }
 

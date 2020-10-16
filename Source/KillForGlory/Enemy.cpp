@@ -38,5 +38,8 @@ void AEnemy::EnemyDamage(int _damage)
 {
 	if(currentLife > 0)
 		currentLife -= _damage;
+
+	if(currentLife <= 0)
+		Destroy();
 	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(currentLife));
 }

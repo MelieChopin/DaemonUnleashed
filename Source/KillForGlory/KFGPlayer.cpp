@@ -75,7 +75,7 @@ void AKFGPlayer::Tick(float DeltaTime)
 	{
 		isUntouchable = false;
 		timeOfUntouchable = 0.0f;
-	}
+	}	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -144,4 +144,7 @@ void AKFGPlayer::PlayerDamage(int damage)
 {
 	if(*currentLife > 0)
 		*currentLife -= damage;
+
+	if(*currentLife <= 0)
+		UGameplayStatics::OpenLevel(GetWorld(),"MainMenu");
 }
