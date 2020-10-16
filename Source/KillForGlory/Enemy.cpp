@@ -3,6 +3,8 @@
 
 #include "Enemy.h"
 
+#include "Engine/Engine.h"
+
 // Sets default values
 AEnemy::AEnemy()
 {
@@ -32,3 +34,9 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::EnemyDamage(int _damage)
+{
+	if(currentLife > 0)
+		currentLife -= _damage;
+	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(currentLife));
+}

@@ -43,11 +43,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+	//// EnemyStat
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=EnemyStat)
+	float currentLife = 0;
+	////
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void EnemyDamage(int _damage);
 };

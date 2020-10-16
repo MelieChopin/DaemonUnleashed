@@ -3,6 +3,8 @@
 
 #include "KFGPlayerHuman.h"
 
+
+#include "Enemy.h"
 #include "KFGPlayerDeamon.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
@@ -245,6 +247,12 @@ void AKFGPlayerHuman::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlapped
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
+    if(OtherActor->ActorHasTag("Enemy"))
+    {
+        AEnemy* enemy = Cast<AEnemy>(OtherActor);
+        if(enemy != nullptr)
+            enemy->EnemyDamage(attackDamage);
+    }
 }
 
 void AKFGPlayerHuman::Jumping()
