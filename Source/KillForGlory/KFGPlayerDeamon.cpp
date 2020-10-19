@@ -16,6 +16,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/Engine.h"
+#include "GameFramework/SpringArmComponent.h"
 
 AKFGPlayerDeamon::AKFGPlayerDeamon()
 {
@@ -27,6 +28,14 @@ AKFGPlayerDeamon::AKFGPlayerDeamon()
 	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 }
 
+
+void AKFGPlayerDeamon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	isPossessed = false;
+}
+
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
 {
     if(_humanForm != nullptr)
@@ -36,6 +45,11 @@ void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
 void AKFGPlayerDeamon::Tick(float DeltaTime) 
 {
 	Super::Tick(DeltaTime);
+	
+	if(isPossessed)
+	{
+		humanForm->SetActorTransform(GetActorTransform());
+	}
 
 	if (playerState == EPlayerState::ROLL)
 		Charge();
@@ -122,7 +136,6 @@ void AKFGPlayerDeamon::EndCharge()
 void AKFGPlayerDeamon::Attack()
 {
 	bufferAttack = true;
-
 	if(playerState != EPlayerState::ATTACK && playerState != EPlayerState::ROLL)
 	{
 		attackNum = 0;
@@ -216,9 +229,9 @@ void AKFGPlayerDeamon::TransformToHuman()
 {
     if(humanForm != nullptr)
     {
+        humanForm->SetActorTransform(GetActorTransform());
         humanForm->SetActorEnableCollision(true);
         humanForm->SetActorHiddenInGame(false);
-        humanForm->SetActorTransform(GetActorTransform());
         SetActorHiddenInGame(true);
         SetActorEnableCollision(false);
         APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
@@ -227,6 +240,8 @@ void AKFGPlayerDeamon::TransformToHuman()
         GetController()->Possess(humanForm);
         humanForm->GetCharacterMovement()->Velocity = GetVelocity();
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
+    	isPossessed = false;
+    	humanForm->isPossessed = true;
     }
 }
 

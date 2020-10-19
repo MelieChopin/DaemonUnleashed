@@ -123,6 +123,8 @@ public:
 	int specialDamage = 0;
 	////
 	
+	bool isPossessed;
+	
 	bool bufferAttack = false;
 	UPROPERTY(BlueprintReadWrite)
 	bool recoverAttack = false;

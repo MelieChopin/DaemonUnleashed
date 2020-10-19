@@ -21,6 +21,8 @@ public:
 
     void SetHumanForm(class AKFGPlayerHuman* _humanForm);
 
+    virtual void BeginPlay() override;
+    
     virtual void Tick(float DeltaTime) override;
 protected:
     class AKFGPlayerHuman* humanForm = nullptr;
@@ -104,6 +106,8 @@ public:
     int specialDamage = 0;
     ////
 
+    bool isPossessed;
+    
     void changePlayerState(EPlayerState newPlayerState);
     
     

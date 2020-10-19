@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 AKFGPlayerHuman::AKFGPlayerHuman()
@@ -39,12 +40,19 @@ void AKFGPlayerHuman::BeginPlay()
     deamonForm->SetHumanForm(this);
     deamonForm->SetActorHiddenInGame(true);
     deamonForm->SetActorEnableCollision(false);
+
+    isPossessed = true;
 }
 
 void AKFGPlayerHuman::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if(isPossessed)
+    {
+        deamonForm->SetActorTransform(GetActorTransform());
+    }
+    
     if (isFreeze)
     {
         timeForWallJump += DeltaTime;
@@ -140,12 +148,13 @@ void AKFGPlayerHuman::TransformToDeamon()
         SetActorHiddenInGame(true);
         SetActorEnableCollision(false);
         APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-        //FVector camPosition = cameraManager->GetCameraLocation();
         FRotator camRotation = cameraManager->GetCameraRotation();
         FRotator playerRotation = GetActorRotation();
         GetController()->Possess(deamonForm);
         deamonForm->GetCharacterMovement()->Velocity = GetVelocity();
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
+        isPossessed = false;
+        deamonForm->isPossessed = true;
     }
 }
 
@@ -271,7 +280,7 @@ void AKFGPlayerHuman::Jumping()
 void AKFGPlayerHuman::OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor != this && !OtherActor->ActorHasTag("WallJump"))
+    if (!OtherActor->ActorHasTag("WallJump"))
         return;
 
     FCollisionQueryParams TraceParams;

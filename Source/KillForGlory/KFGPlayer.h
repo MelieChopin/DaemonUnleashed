@@ -63,7 +63,6 @@ protected:
 	float timeOfUntouchable = 0.0f;
 
 	float timeAnimationHit;
-	
 
 public:
 	/** Returns CameraBoom subobject **/
