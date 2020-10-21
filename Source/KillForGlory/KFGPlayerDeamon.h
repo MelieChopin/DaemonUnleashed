@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "KFGPlayer.h"
+
+#include "Components/TimelineComponent.h"
+
 #include "KFGPlayerDeamon.generated.h"
 
 class UBoxComponent;
@@ -70,23 +73,13 @@ public:
     //// CHARGE
     UPROPERTY(EditAnywhere, Category=Charge)
     float distanceMax;
-    UPROPERTY(EditAnywhere, Category=Charge)
-    float speedMovement;
-    UPROPERTY(EditAnywhere, Category=Charge)
-    float trajectoryAdjustment;
-    UPROPERTY(EditAnywhere, Category=Charge)
-    float lerpPercent;
-
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Charge)
+    UPROPERTY(BlueprintReadWrite, Category=Charge)
     bool isCharging;
     
     FVector forwardVector;
     FVector beginLocation;
     float currentDistance = 0.0f;
     float yawRate;
-
-    //UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
-    //UBoxComponent* collisionCharge;
 
     void BeginCharge();
     void Charge();
