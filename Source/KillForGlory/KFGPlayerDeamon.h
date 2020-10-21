@@ -94,11 +94,17 @@ public:
     void EndCharge();
     ////
 
+    // Basic attack
     bool bufferAttack = false;
     UPROPERTY(BlueprintReadWrite)
     bool recoverAttack = false;
     int attackNum = 0;
 
+    // Special Attack
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
+    float specialRange = 0;
+    void Special();
+    
     //// PlayerStat
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
     int attackDamage = 0;

@@ -14,9 +14,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/Engine.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AKFGPlayerDeamon::AKFGPlayerDeamon()
 {
@@ -62,6 +64,7 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
     PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed, this, &AKFGPlayerDeamon::BeginCharge);
     PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AKFGPlayerDeamon::Attack);
+	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AKFGPlayerDeamon::Special);
     //Call parent
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
@@ -202,6 +205,27 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 		AEnemy* enemy = Cast<AEnemy>(OtherActor);
 		if(enemy != nullptr)
 			enemy->EnemyDamage(attackDamage);
+	}
+}
+
+void AKFGPlayerDeamon::Special()
+{
+	TArray<AActor*> foundEnemy;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+    
+	for(AActor* actorEnemy : foundEnemy)
+	{
+		if(FVector::Dist(actorEnemy->GetActorLocation(),GetActorLocation()) <= specialRange)
+		{
+			AEnemy* enemy = Cast<AEnemy>(actorEnemy);
+			if(enemy == nullptr)
+				continue;
+			GEngine->AddOnScreenDebugMessage(-1,1,FColor::Blue,"test");
+			FVector launchDir = GetActorLocation() - enemy->GetActorLocation();
+			launchDir *= 2;
+			enemy->LaunchCharacter(FVector(launchDir.X,launchDir.Y,350),true,true);
+			enemy->EnemyDamage(specialDamage);
+		}
 	}
 }
 
