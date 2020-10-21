@@ -89,8 +89,6 @@ public:
 
 	EPlayerState playerState = EPlayerState::NONE;
 
-	void changePlayerState(EPlayerState newPlayerState);
-
 	virtual void Tick(float DeltaTime) override;
 
 };

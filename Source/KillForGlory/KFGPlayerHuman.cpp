@@ -4,15 +4,21 @@
 #include "KFGPlayerHuman.h"
 
 
+
+#include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "KFGPlayerDeamon.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Chaos/Utilities.h"
 #include "Components/InputComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Camera/CameraComponent.h"
 
 
 AKFGPlayerHuman::AKFGPlayerHuman()
@@ -176,6 +182,38 @@ void AKFGPlayerHuman::AttackLaunch()
 {
     if(!bufferAttack)
         return;
+
+    TArray<AActor*> foundEnemy;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+    
+    AActor* enemyTarget = nullptr;
+    for(AActor* enemy : foundEnemy)
+    {
+        if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f)
+        {
+            if(enemyTarget == nullptr)
+            {
+                enemyTarget = enemy;
+                continue;
+            }
+            
+            FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
+            inputDir.Normalize();
+            const FRotator Rotation = Controller->GetControlRotation();
+            const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+            FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
+            
+            if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
+                enemyTarget = enemy;
+        }
+    }
+    
+    if(enemyTarget != nullptr)
+    {
+        FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),enemyTarget->GetActorLocation());
+        SetActorRotation(rot);
+    }
 	
     UAnimMontage* animToPlay = nullptr;
 
