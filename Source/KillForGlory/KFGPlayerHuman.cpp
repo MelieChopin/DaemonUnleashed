@@ -72,17 +72,16 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
         }
     }
 
-    if(currentCooldownSpecialAttack > 0 && playerState == EPlayerState::NONE)
+    if(currentCooldownSpecialAttack > 0 && playerState != EPlayerState::SPECIAL)
     {
         currentCooldownSpecialAttack -= DeltaTime;
     }
 
     if(playerState == EPlayerState::SPECIAL)
     {
-        //TArray<AKFGEnemy> overlappedEnemyList;
-        //specialHitBox->GetOverlappingActors(overlappedEnemyList,TSubclassOf<AKFGEnemy>());
-        
-        //SpecialActorOverlapped(overlappedEnemyList);
+        TArray<AActor*> overlappedEnemyList;
+        specialHitBox->GetOverlappingActors(overlappedEnemyList,TSubclassOf<AEnemy>());
+        SpecialActorOverlapped(overlappedEnemyList);
     }
 }
 
@@ -212,6 +211,8 @@ void AKFGPlayerHuman::AttackLaunch()
     if(enemyTarget != nullptr)
     {
         FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),enemyTarget->GetActorLocation());
+        rot.Pitch = 0;
+        rot.Roll = 0;
         SetActorRotation(rot);
     }
 	
@@ -275,9 +276,14 @@ void AKFGPlayerHuman::SpecialEnd()
     changePlayerState(EPlayerState::NONE);
 }
 
-void AKFGPlayerHuman::SpecialActorOverlapped()
+void AKFGPlayerHuman::SpecialActorOverlapped(const TArray<AActor*>& enemyList)
 {
-    
+    for(AActor* actor : enemyList)
+    {
+        AEnemy* enemy = Cast<AEnemy>(actor);
+        if(enemy != nullptr) // Check if cast work
+            enemy->EnemyDamage(specialDamage);
+    }
 }
 
 void AKFGPlayerHuman::EnableAttackHitBox()

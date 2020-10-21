@@ -80,7 +80,7 @@ public:
     void DisableSpecial();
 	UFUNCTION(BlueprintCallable)
     void SpecialEnd();
-	
+
 	UFUNCTION(BlueprintCallable)
     void EnableAttackHitBox();
 	UFUNCTION(BlueprintCallable)
@@ -133,7 +133,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
 	float cooldownSpecialAttack = 0;
 	float currentCooldownSpecialAttack = 0;
-	void SpecialActorOverlapped(); // Called every frame during special attack
+	void SpecialActorOverlapped(const TArray<AActor*>& enemyList); // Called every frame during special attack
 	
 	void changePlayerState(EPlayerState newPlayerState);
 };
