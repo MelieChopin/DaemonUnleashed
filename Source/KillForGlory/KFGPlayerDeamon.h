@@ -75,6 +75,8 @@ public:
     float distanceMax;
     UPROPERTY(BlueprintReadWrite, Category=Charge)
     bool isCharging;
+    UPROPERTY(BlueprintReadWrite, Category=Charge)
+    bool isFinish;
     
     FVector forwardVector;
     FVector beginLocation;
