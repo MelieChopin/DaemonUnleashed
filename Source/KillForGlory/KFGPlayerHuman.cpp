@@ -182,31 +182,7 @@ void AKFGPlayerHuman::AttackLaunch()
     if(!bufferAttack)
         return;
 
-    TArray<AActor*> foundEnemy;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
-    
-    AActor* enemyTarget = nullptr;
-    for(AActor* enemy : foundEnemy)
-    {
-        if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f)
-        {
-            if(enemyTarget == nullptr)
-            {
-                enemyTarget = enemy;
-                continue;
-            }
-            
-            FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
-            inputDir.Normalize();
-            const FRotator Rotation = Controller->GetControlRotation();
-            const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-            FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
-            
-            if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
-                enemyTarget = enemy;
-        }
-    }
+    AActor* enemyTarget = findNearestEnemyFromInput();
     
     if(enemyTarget != nullptr)
     {
@@ -349,6 +325,37 @@ void AKFGPlayerHuman::OnWallJumpEndOverlap(class UPrimitiveComponent* Overlapped
     GetCharacterMovement()->GravityScale = 1.0f;
     isFreeze = false;
     timeForWallJump = 0.0f;
+}
+
+AActor* AKFGPlayerHuman::findNearestEnemyFromInput()
+{
+    TArray<AActor*> foundEnemy;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+    
+    AActor* enemyTarget = nullptr;
+    for(AActor* enemy : foundEnemy)
+    {
+        if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f)
+        {
+            if(enemyTarget == nullptr)
+            {
+                enemyTarget = enemy;
+                continue;
+            }
+            
+            FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
+            inputDir.Normalize();
+            const FRotator Rotation = Controller->GetControlRotation();
+            const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+            FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
+            
+            if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
+                enemyTarget = enemy;
+        }
+    }
+
+    return enemyTarget;
 }
 
 void AKFGPlayerHuman::changePlayerState(EPlayerState newPlayerState)

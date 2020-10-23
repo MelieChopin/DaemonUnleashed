@@ -104,6 +104,9 @@ public:
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
     float specialRange = 0;
     void Special();
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
+    float cooldownSpecialAttack = 0;
+    float currentCooldownSpecialAttack = 0;
     
     //// PlayerStat
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
@@ -113,9 +116,9 @@ public:
     ////
 
     bool isPossessed;
-    
+
+    AActor* findNearestEnemyFromInput();
     void changePlayerState(EPlayerState newPlayerState);
-    
     
     void TransformToHuman();
 };

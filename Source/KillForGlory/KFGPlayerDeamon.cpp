@@ -25,7 +25,6 @@ AKFGPlayerDeamon::AKFGPlayerDeamon()
 	attackHitBox = CreateDefaultSubobject<UBoxComponent>("AttackHitBox");
     attackHitBox->SetupAttachment(RootComponent);
 	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap);
-	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 }
@@ -35,6 +34,7 @@ void AKFGPlayerDeamon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	attackHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	isPossessed = false;
 }
 
@@ -55,6 +55,9 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 
 	if (playerState == EPlayerState::ROLL)
 		Charge();
+
+	if(currentCooldownSpecialAttack > 0 && playerState != EPlayerState::SPECIAL)
+		currentCooldownSpecialAttack -= DeltaTime;
 
 }
 
@@ -153,6 +156,16 @@ void AKFGPlayerDeamon::AttackLaunch()
 {
 	if(!bufferAttack)
 		return;
+
+	AActor* enemyTarget = findNearestEnemyFromInput();
+    
+	if(enemyTarget != nullptr)
+	{
+		FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),enemyTarget->GetActorLocation());
+		rot.Pitch = 0;
+		rot.Roll = 0;
+		SetActorRotation(rot);
+	}
 	
 	UAnimMontage* animToPlay = nullptr;
 
@@ -210,6 +223,11 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 
 void AKFGPlayerDeamon::Special()
 {
+	if(currentCooldownSpecialAttack > 0)
+		return;
+
+	currentCooldownSpecialAttack = cooldownSpecialAttack;
+	
 	TArray<AActor*> foundEnemy;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
     
@@ -227,6 +245,37 @@ void AKFGPlayerDeamon::Special()
 			enemy->EnemyDamage(specialDamage);
 		}
 	}
+}
+
+AActor* AKFGPlayerDeamon::findNearestEnemyFromInput()
+{
+	TArray<AActor*> foundEnemy;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+    
+	AActor* enemyTarget = nullptr;
+	for(AActor* enemy : foundEnemy)
+	{
+		if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f)
+		{
+			if(enemyTarget == nullptr)
+			{
+				enemyTarget = enemy;
+				continue;
+			}
+            
+			FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
+			inputDir.Normalize();
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+			FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
+            
+			if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
+				enemyTarget = enemy;
+		}
+	}
+
+	return enemyTarget;
 }
 
 void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)

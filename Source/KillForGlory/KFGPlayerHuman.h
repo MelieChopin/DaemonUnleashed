@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "KFGPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
@@ -134,6 +135,8 @@ public:
 	float cooldownSpecialAttack = 0;
 	float currentCooldownSpecialAttack = 0;
 	void SpecialActorOverlapped(const TArray<AActor*>& enemyList); // Called every frame during special attack
+
+	AActor* findNearestEnemyFromInput();
 	
 	void changePlayerState(EPlayerState newPlayerState);
 };
