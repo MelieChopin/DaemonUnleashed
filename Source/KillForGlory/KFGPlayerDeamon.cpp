@@ -51,6 +51,8 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 	if(isPossessed)
 	{
 		humanForm->SetActorTransform(GetActorTransform());
+
+		*transformRatio += DeltaTime * *transformRatioSpeed;
 	}
 
 	if (playerState == EPlayerState::ROLL)

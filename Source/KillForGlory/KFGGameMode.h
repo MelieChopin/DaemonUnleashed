@@ -26,6 +26,10 @@ public:
 	int maxLife = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int currentLife = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	float transformRatio = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	float transformRatioSpeed = 0;
 	////
 	
 };

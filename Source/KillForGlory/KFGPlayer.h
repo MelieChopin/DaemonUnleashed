@@ -85,6 +85,8 @@ public:
 
 	//// Player Stat
 	int* currentLife = nullptr; // Point on currentLife KFGGameMode
+	float* transformRatio = nullptr; // Point on transformRatio in KFGGameMode
+	float* transformRatioSpeed = nullptr; // Point on transformRatioSpeed in KFGGameMode
 	////
 
 	EPlayerState playerState = EPlayerState::NONE;

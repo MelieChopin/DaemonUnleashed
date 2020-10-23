@@ -57,6 +57,8 @@ void AKFGPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	currentLife = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->currentLife;
+	transformRatio = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->transformRatio;
+	transformRatioSpeed = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->transformRatioSpeed;
 
 	if(currentLife == nullptr)
 		EndPlay(EEndPlayReason::Quit);
