@@ -59,6 +59,12 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
         deamonForm->SetActorTransform(GetActorTransform());
 
         *transformRatio -= DeltaTime * *transformRatioSpeed;
+
+        if(*transformRatio <= 0)
+        {
+            TransformToDeamon();
+            return;
+        }
     }
     
     if (isFreeze)

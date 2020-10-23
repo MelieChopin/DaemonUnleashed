@@ -53,6 +53,12 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 		humanForm->SetActorTransform(GetActorTransform());
 
 		*transformRatio += DeltaTime * *transformRatioSpeed;
+
+		if(*transformRatio >= 1)
+		{
+			TransformToHuman();
+			return;
+		}
 	}
 
 	if (playerState == EPlayerState::ROLL)
