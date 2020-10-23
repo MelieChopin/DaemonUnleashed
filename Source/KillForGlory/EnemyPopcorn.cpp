@@ -20,10 +20,6 @@ AEnemyPopcorn::AEnemyPopcorn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	isAttacking = false;
-	
-	boxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
-	boxCollision->SetupAttachment(RootComponent);
-
 }
 
 // Called when the game starts or when spawned
@@ -31,8 +27,7 @@ void AEnemyPopcorn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	boxCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemyPopcorn::OnOverlapBegin);
-	boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	
 }
 
@@ -47,12 +42,12 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	if (isAttacking)
 	{
 		if (changeIsAttacking <= 0.1)
-			PlayAnimMontage(attack);
+			PlayAnimMontage(attackBasic);
 		//GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Blue, FString::SanitizeFloat(timeAttack));
 		changeIsAttacking += DeltaTime;
 		if (changeIsAttacking >= timeAnimAttack)
 		{
-			StopAnimMontage(attack);
+			StopAnimMontage(attackBasic);
 			changeIsAttacking = 0.0f;
 			isAttacking = false;
 		}
@@ -68,30 +63,7 @@ void AEnemyPopcorn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 }
 
 
-void AEnemyPopcorn::EnableAttackHitBox()
-{
-	boxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-}
 
-void AEnemyPopcorn::DisableAttackHitBox()
-{
-	boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
 
-void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if(OtherActor->ActorHasTag("Player") && OtherComp->ComponentHasTag("Body"))
-	{
-		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red, "EnemyHit");
-		AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
-		if(player != nullptr)
-			player->PlayerDamage(damage);
-	}
-	
-	if (OtherActor == nullptr || !isAttacking)
-		return;
-	
-}
 
 

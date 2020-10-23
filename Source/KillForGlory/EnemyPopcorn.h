@@ -17,13 +17,6 @@ class KILLFORGLORY_API AEnemyPopcorn : public AEnemy
 public:
 	// Sets default values for this character's properties
 	AEnemyPopcorn();
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
-	UAnimMontage* attack;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
-	UBoxComponent* boxCollision;
-
 	
 protected:
 	// Called when the game starts or when spawned
@@ -35,16 +28,5 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	////Event
-	UFUNCTION(BlueprintCallable)
-    void EnableAttackHitBox();
-	UFUNCTION(BlueprintCallable)
-    void DisableAttackHitBox();
-	////
-	
-	UFUNCTION()
-    void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };

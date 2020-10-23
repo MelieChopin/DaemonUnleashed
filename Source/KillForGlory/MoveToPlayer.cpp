@@ -23,7 +23,7 @@ EBTNodeResult::Type UMoveToPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp
             enemy->isFollowingPlayer = true;
             FVector newVector = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation() - playerLocation;
             newVector.Normalize();
-            newVector = newVector * 170;
+            newVector = newVector * enemy->distanceWaitToAttackPlayer;
             FVector EP = playerLocation - OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation();
             OwnerComp.GetAIOwner()->MoveToLocation((EP + newVector) + OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation());
             

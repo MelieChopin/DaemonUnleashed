@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+class UBoxComponent;
 UCLASS()
+
 class KILLFORGLORY_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
@@ -19,13 +21,13 @@ public:
     float speedAttack;
              
     UPROPERTY(EditAnywhere)
-    float damage;
-             
-    UPROPERTY(EditAnywhere)
-    float speedMove;
+    float damage; 
              
     UPROPERTY(EditAnywhere)
     float distanceToFocusPlayer;
+
+	UPROPERTY(EditAnywhere)
+	float distanceWaitToAttackPlayer;
              
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool isAttacking;
@@ -36,6 +38,15 @@ public:
 	float timeAttack;
 	float changeIsAttacking;
 	float timeAnimAttack = 0.6f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
+	UBoxComponent* boxCollision;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* attackBasic;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* attackSpe;
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,4 +66,16 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void EnemyDamage(int _damage);
+
+
+	////Event
+	UFUNCTION(BlueprintCallable)
+    void EnableAttackHitBox();
+	UFUNCTION(BlueprintCallable)
+    void DisableAttackHitBox();
+	////
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
