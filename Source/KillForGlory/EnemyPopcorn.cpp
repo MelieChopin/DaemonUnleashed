@@ -6,9 +6,6 @@
 
 
 #include "KFGGameMode.h"
-#include "Animation/AnimSequence.h"
-#include "Chaos/GeometryParticlesfwd.h"
-#include "Components/BoxComponent.h"
 #include "Engine/Engine.h"
 
 class AKFGPlayer;
@@ -27,8 +24,6 @@ void AEnemyPopcorn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	
 }
 
 // Called every frame

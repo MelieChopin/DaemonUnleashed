@@ -15,14 +15,15 @@ AEnemy::AEnemy()
 
 	boxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
 	boxCollision->SetupAttachment(RootComponent);
+	boxCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
+    boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	boxCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
-    boxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 // Called every frame
@@ -30,6 +31,7 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 // Called to bind functionality to input

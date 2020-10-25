@@ -3,9 +3,7 @@
 
 #include "AEnemyMage.h"
 
+#include "GameFramework/Actor.h"
 #include "Engine/World.h"
 
-void AAEnemyMage::BeginPlay()
-{
-   // GetWorld()->SpawnActor<AActor>(enemyClass->GetClass(), GetActorLocation(), FRotator::ZeroRotator);
-}
+
