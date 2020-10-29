@@ -123,15 +123,15 @@ void AKFGPlayerDeamon::BeginCharge()
 	GetCharacterMovement()->Velocity = forwardVector;
 
 	currentDistance = 0.0f;
-	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
+///	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
 	isCharging = true;
     GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("BEGINCHARGE"));
 }
 
 void AKFGPlayerDeamon::Charge()
 {
-	GetCharacterMovement()->Velocity = GetVelocity() + FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
-	forwardVector = FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
+	//GetCharacterMovement()->Velocity = GetVelocity() + FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
+	//forwardVector = FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
 
 	currentDistance += (beginLocation - GetActorLocation()).Size();
 	beginLocation = GetActorLocation();
