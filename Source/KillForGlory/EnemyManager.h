@@ -23,11 +23,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float sizeSpawn;
 	
-	UPROPERTY()
-	TArray<AActor*> listEnemies;
-	
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AEnemyPopcorn> enemyClass = nullptr;
+	TSubclassOf<class AEnemy> enemyClass = nullptr;
 
 protected:
 	// Called when the game starts or when spawned

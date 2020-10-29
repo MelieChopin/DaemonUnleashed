@@ -51,7 +51,6 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 			isAttacking = false;
 		}
 	}
-
 }
 
 // Called to bind functionality to input

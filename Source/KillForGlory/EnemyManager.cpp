@@ -28,7 +28,8 @@ void AEnemyManager::BeginPlay()
 	for (int i = 0; i < numberOfEnemies; i++)
 	{
 		FVector newPosition(FMath::RandRange(xMin, xMax), FMath::RandRange(yMin, yMax), GetActorLocation().Z);
-		listEnemies.Add(GetWorld()->SpawnActor<AActor>(enemyClass.Get(), newPosition, FRotator::ZeroRotator));
+		GetWorld()->SpawnActor<AActor>(enemyClass.Get(), GetActorLocation(), FRotator::ZeroRotator);
+		GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Purple, FString::FromInt(i));
 	}	
 }
 
