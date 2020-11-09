@@ -58,7 +58,8 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
     {
         deamonForm->SetActorTransform(GetActorTransform());
 
-        *transformRatio -= DeltaTime * *transformRatioSpeed;
+        if(*transformRatio > 0)
+            *transformRatio -= DeltaTime * *transformRatioSpeed;
 
         if(*transformRatio <= 0)
         {
@@ -135,7 +136,7 @@ void AKFGPlayerHuman::MoveRight(float Value)
 
 void AKFGPlayerHuman::Roll()
 {
-    if(playerState == EPlayerState::ROLL)
+    if(playerState == EPlayerState::ROLL || timeStun > 0)
         return;
     
     PlayAnimMontage(rollAnim);
@@ -153,6 +154,9 @@ void AKFGPlayerHuman::RollEnd()
 
 void AKFGPlayerHuman::TransformToDeamon()
 {
+    if(timeStun > 0)
+        return;
+    
     if(deamonForm != nullptr)
     {
         deamonForm->SetActorTransform(GetActorTransform());
@@ -173,6 +177,9 @@ void AKFGPlayerHuman::TransformToDeamon()
 
 void AKFGPlayerHuman::Attack()
 {
+    if(timeStun > 0)
+        return;
+    
     bufferAttack = true;
 
     if(playerState != EPlayerState::ATTACK && playerState != EPlayerState::ROLL)
@@ -237,6 +244,9 @@ void AKFGPlayerHuman::AttackReset()
 
 void AKFGPlayerHuman::Special()
 {
+    if(timeStun > 0)
+        return;
+    
     if(currentCooldownSpecialAttack <= 0 && (playerState == EPlayerState::NONE || recoverAttack))
     {
         PlayAnimMontage(specialAttack);

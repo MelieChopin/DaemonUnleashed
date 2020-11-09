@@ -52,7 +52,8 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 	{
 		humanForm->SetActorTransform(GetActorTransform());
 
-		*transformRatio += DeltaTime * *transformRatioSpeed;
+		if(*transformRatio < 1)
+			*transformRatio += DeltaTime * *transformRatioSpeed;
 
 		if(*transformRatio >= 1)
 		{
@@ -110,7 +111,7 @@ void AKFGPlayerDeamon::MoveRight(float Value)
 
 void AKFGPlayerDeamon::BeginCharge()
 {
-	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || (playerState == EPlayerState::ATTACK && !recoverAttack))
+	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || (playerState == EPlayerState::ATTACK && !recoverAttack) || timeStun > 0)
 		return;
 
 	if(recoverAttack)
@@ -149,6 +150,9 @@ void AKFGPlayerDeamon::EndCharge()
 
 void AKFGPlayerDeamon::Attack()
 {
+	if(timeStun > 0)
+		return;
+	
 	bufferAttack = true;
 	if(playerState != EPlayerState::ATTACK && playerState != EPlayerState::ROLL)
 	{
@@ -231,7 +235,7 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 
 void AKFGPlayerDeamon::Special()
 {
-	if(currentCooldownSpecialAttack > 0)
+	if(currentCooldownSpecialAttack > 0 || timeStun > 0)
 		return;
 
 	currentCooldownSpecialAttack = cooldownSpecialAttack;
@@ -308,6 +312,9 @@ void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)
 
 void AKFGPlayerDeamon::TransformToHuman()
 {
+	if(timeStun > 0)
+		return;
+	
     if(humanForm != nullptr)
     {
         humanForm->SetActorTransform(GetActorTransform());

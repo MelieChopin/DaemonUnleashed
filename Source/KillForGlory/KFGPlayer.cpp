@@ -77,7 +77,12 @@ void AKFGPlayer::Tick(float DeltaTime)
 	{
 		isUntouchable = false;
 		timeOfUntouchable = 0.0f;
-	}	
+	}
+
+	if(timeStun > 0)
+	{
+		timeStun -= DeltaTime;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -115,7 +120,7 @@ void AKFGPlayer::LookUpAtRate(float Rate)
 
 void AKFGPlayer::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
+	if ((Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable) && (timeStun <= 0))
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -129,7 +134,7 @@ void AKFGPlayer::MoveForward(float Value)
 
 void AKFGPlayer::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable))
+	if ( (Controller != NULL) && (Value != 0.0f) && !(timeOfUntouchable <= timeAnimationHit && isUntouchable) && (timeStun <= 0))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -149,4 +154,10 @@ void AKFGPlayer::PlayerDamage(int damage)
 
 	if(*currentLife <= 0)
 		UGameplayStatics::OpenLevel(GetWorld(),"MainMenu");
+}
+
+
+void AKFGPlayer::PlayerStun(float _timeStun)
+{
+	timeStun = _timeStun;
 }

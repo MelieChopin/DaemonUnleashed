@@ -82,11 +82,15 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerDamage(int damage);
+	UFUNCTION(BlueprintCallable)
+	void PlayerStun(float _timeStun);
 
 	//// Player Stat
 	int* currentLife = nullptr; // Point on currentLife KFGGameMode
 	float* transformRatio = nullptr; // Point on transformRatio in KFGGameMode
 	float* transformRatioSpeed = nullptr; // Point on transformRatioSpeed in KFGGameMode
+	UPROPERTY(BlueprintReadOnly)
+	float timeStun = 0; // if = 0 not stun else stun
 	////
 
 	EPlayerState playerState = EPlayerState::NONE;

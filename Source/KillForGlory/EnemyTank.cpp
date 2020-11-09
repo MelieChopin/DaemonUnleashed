@@ -106,6 +106,9 @@ void AEnemyTank::OnSpecialHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
         
         AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
         if(player != nullptr)
+        {
             player->PlayerDamage(specialDamage);
+            player->PlayerStun(specialStun);
+        }
     }
 }

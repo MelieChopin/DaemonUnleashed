@@ -60,4 +60,6 @@ public:
 	float currentSpecialCooldown = 0;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=EnemyTank)
 	float specialDamage = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=EnemyTank)
+	float specialStun = 0;
 };
