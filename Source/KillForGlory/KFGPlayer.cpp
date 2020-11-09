@@ -68,16 +68,18 @@ void AKFGPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, FString::SanitizeFloat(currentLife));
-
 	if (isUntouchable)
-		timeOfUntouchable += DeltaTime;
-
-	if (timeOfUntouchable >= timeUntouchable)
 	{
-		isUntouchable = false;
-		timeOfUntouchable = 0.0f;
-	}	
+		timeOfUntouchable += DeltaTime;
+                                       	
+        if (timeOfUntouchable >= timeUntouchable)
+        {
+            isUntouchable = false;
+            GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 1.0f);
+            GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.0f);
+            timeOfUntouchable = 0.0f;
+        }	
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -144,9 +146,14 @@ void AKFGPlayer::MoveRight(float Value)
 
 void AKFGPlayer::PlayerDamage(int damage)
 {
-	if(*currentLife > 0)
+	if(*currentLife > 0 && !isUntouchable)
+	{
 		*currentLife -= damage;
-
+		isUntouchable = true;
+		GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 0.5f);
+		GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.9f);
+	}
+		
 	if(*currentLife <= 0)
 		UGameplayStatics::OpenLevel(GetWorld(),"MainMenu");
 }

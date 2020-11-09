@@ -3,6 +3,9 @@
 
 #include "EnemyPopcorn.h"
 
+#include <xkeycheck.h>
+
+
 #include "KFGGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Components/PrimitiveComponent.h"
@@ -34,6 +37,12 @@ void AEnemyPopcorn::BeginPlay()
 void AEnemyPopcorn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (isTouching)
+	{
+		StopAnimMontage(attackBasic);
+		return;
+	}
 	
 	if (isFollowingPlayer)
 		timeAttack += DeltaTime;
@@ -42,7 +51,6 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	{
 		if (changeIsAttacking <= 0.1)
 			PlayAnimMontage(attackBasic);
-		//GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Blue, FString::SanitizeFloat(timeAttack));
 		changeIsAttacking += DeltaTime;
 		if (changeIsAttacking >= timeAnimAttack)
 		{
@@ -57,7 +65,6 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 void AEnemyPopcorn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 
@@ -75,16 +82,13 @@ void AEnemyPopcorn::DisableAttackHitBox()
 void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor->ActorHasTag("Player") && OtherComp->ComponentHasTag("Body"))
+	if(OtherActor->ActorHasTag("Player") && OtherComp->ComponentHasTag("Body") && !isTouching)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red, OtherComp->GetName());
 		AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
 		if(player != nullptr)
 			player->PlayerDamage(damage);
 	}
-	
-	if (OtherActor == nullptr || !isAttacking)
-		return;
 }
 
 

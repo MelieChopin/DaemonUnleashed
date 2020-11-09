@@ -37,6 +37,9 @@ public:
 
 protected:
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* hitAnim;
+	
 	/** Called for forwards/backward input */
 	virtual void MoveForward(float Value);
 

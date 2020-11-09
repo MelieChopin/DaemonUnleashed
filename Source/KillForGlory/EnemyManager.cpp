@@ -28,8 +28,8 @@ void AEnemyManager::BeginPlay()
 	for (int i = 0; i < numberOfEnemies; i++)
 	{
 		FVector newPosition(FMath::RandRange(xMin, xMax), FMath::RandRange(yMin, yMax), GetActorLocation().Z);
+		GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Black, newPosition.ToString());
 		GetWorld()->SpawnActor<AActor>(enemyClass.Get(), GetActorLocation(), FRotator::ZeroRotator);
-		GEngine->AddOnScreenDebugMessage(-5, 1.0f, FColor::Purple, FString::FromInt(i));
 	}	
 }
 
@@ -40,10 +40,4 @@ void AEnemyManager::Tick(float DeltaTime)
 	
 }
 
-// Called to bind functionality to input
-void AEnemyManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
