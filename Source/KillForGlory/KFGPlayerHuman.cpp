@@ -3,8 +3,6 @@
 
 #include "KFGPlayerHuman.h"
 
-
-
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "KFGPlayerDeamon.h"
@@ -56,6 +54,7 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
     if(isPossessed)
     {
         deamonForm->SetActorTransform(GetActorTransform());
+        deamonForm->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
         *transformRatio -= DeltaTime * *transformRatioSpeed;
 
@@ -165,6 +164,7 @@ void AKFGPlayerHuman::TransformToDeamon()
         FRotator playerRotation = GetActorRotation();
         GetController()->Possess(deamonForm);
         deamonForm->GetCharacterMovement()->Velocity = GetVelocity();
+        GetCharacterMovement()->Velocity = FVector::ZeroVector;
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
         isPossessed = false;
         deamonForm->isPossessed = true;
@@ -362,9 +362,6 @@ AActor* AKFGPlayerHuman::findNearestEnemyFromInput()
                 if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
                      enemyTarget = enemy;
             }
-            
-            
-            
         }
     }
 
