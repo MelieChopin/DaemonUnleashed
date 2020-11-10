@@ -3,8 +3,6 @@
 
 #include "KFGPlayerHuman.h"
 
-
-
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "KFGPlayerDeamon.h"
@@ -18,7 +16,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Camera/CameraComponent.h"
 
 
 AKFGPlayerHuman::AKFGPlayerHuman()
@@ -57,6 +54,7 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
     if(isPossessed)
     {
         deamonForm->SetActorTransform(GetActorTransform());
+        deamonForm->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
         if(*transformRatio > 0)
             *transformRatio -= DeltaTime * *transformRatioSpeed;
@@ -162,6 +160,7 @@ void AKFGPlayerHuman::TransformToDeamon()
         deamonForm->SetActorTransform(GetActorTransform());
         deamonForm->SetActorEnableCollision(true);
         deamonForm->SetActorHiddenInGame(false);
+        deamonForm->DisableAttackHitBox();
         SetActorHiddenInGame(true);
         SetActorEnableCollision(false);
         APlayerCameraManager* cameraManager = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
@@ -169,6 +168,7 @@ void AKFGPlayerHuman::TransformToDeamon()
         FRotator playerRotation = GetActorRotation();
         GetController()->Possess(deamonForm);
         deamonForm->GetCharacterMovement()->Velocity = GetVelocity();
+        GetCharacterMovement()->Velocity = FVector::ZeroVector;
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
         isPossessed = false;
         deamonForm->isPossessed = true;
@@ -226,8 +226,8 @@ void AKFGPlayerHuman::AttackLaunch()
     default:
         break;
     }
-
-    if(animToPlay != nullptr)
+    
+   if(animToPlay != nullptr)
         PlayAnimMontage(animToPlay);
 
     attackNum = attackNum < 2 ? attackNum+1 : 0;
@@ -276,7 +276,7 @@ void AKFGPlayerHuman::SpecialActorOverlapped(const TArray<AActor*>& enemyList)
     {
         AEnemy* enemy = Cast<AEnemy>(actor);
         if(enemy != nullptr) // Check if cast work
-            enemy->EnemyDamage(specialDamage);
+            enemy->EnemyDamage(specialDamage, true);
     }
 }
 
@@ -293,7 +293,7 @@ void AKFGPlayerHuman::DisableAttackHitBox()
 void AKFGPlayerHuman::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit");
+    GEngine->AddOnScreenDebugMessage(1,1,FColor::Blue,"Hit human");
     if(OtherActor->ActorHasTag("Enemy"))
     {
         AEnemy* enemy = Cast<AEnemy>(OtherActor);
@@ -363,13 +363,15 @@ AActor* AKFGPlayerHuman::findNearestEnemyFromInput()
             
             FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
             inputDir.Normalize();
-            const FRotator Rotation = Controller->GetControlRotation();
-            const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-            FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
-            
-            if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
-                enemyTarget = enemy;
+            if (Controller != nullptr)
+            {
+                const FRotator Rotation = Controller->GetControlRotation();
+                const FRotator YawRotation(0, Rotation.Yaw, 0);
+                
+                FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
+                if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
+                     enemyTarget = enemy;
+            }
         }
     }
 

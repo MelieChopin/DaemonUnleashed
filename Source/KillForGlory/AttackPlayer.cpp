@@ -16,6 +16,7 @@ EBTNodeResult::Type UAttackPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp
         {
             enemy->timeAttack = 0.0f;
             enemy->isAttacking = true;
+            enemy->changeIsAttacking = 0.0f;
         }
           
         return EBTNodeResult::Succeeded;

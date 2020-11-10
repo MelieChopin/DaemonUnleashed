@@ -3,6 +3,8 @@
 
 #include "AEnemyMage.h"
 
+
+#include <xkeycheck.h>
 #include <xkeycheck.h>
 
 
@@ -24,25 +26,39 @@ void AAEnemyMage::BeginPlay()
 void AAEnemyMage::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-	
+
+    if (isTouching)
+    {
+        StopAnimMontage(GetCurrentMontage());
+        changeIsAttacking = 0.0f;
+        timeInvocation = 0.0f;
+        if (listInvocation.Num() != 0)
+            for (int i = 0; i < listInvocation.Num(); i++)
+                listInvocation.RemoveAt(0);
+        return;
+    }
+    
     if (isFollowingPlayer)
     {
         timeAttack += DeltaTime;
         cooldown -= DeltaTime;
     }
 
-    if (cooldown <= 0.0f && numberOfUses > 0)
+    if (cooldown <= 0.0f && numberOfUses > 0 && changeIsAttacking != 0.0f)
     {
         if (timeInvocation <= 0.1)
             PlayAnimMontage(attackSpe);
 
         timeInvocation += DeltaTime;
-        if (timeInvocation >= 2.0f)
+        if (timeInvocation >= 3.0f)
         {
             StopAnimMontage(attackSpe);
             timeInvocation = 0.0f;
             cooldown = cooldownInvocation;
             numberOfUses -= 1;
+            changeIsAttacking = 0.0f;
+            timeAttack = 0.0f;
+            isAttacking = false;
         }
         return;
     }
@@ -58,6 +74,7 @@ void AAEnemyMage::Tick(float DeltaTime)
             StopAnimMontage(attackBasic);
             changeIsAttacking = 0.0f;
             isAttacking = false;
+            changeIsAttacking = 0.0f;
         }
     }
 }

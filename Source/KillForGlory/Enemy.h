@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
@@ -32,18 +33,28 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool isAttacking;
 
-	UPROPERTY(EditAnywhere)
 	bool isFollowingPlayer;
+
+	UPROPERTY(EditAnywhere)
+	float strengthPushBack;
 
 	float timeAttack;
 	float changeIsAttacking;
 	float timeAnimAttack = 0.6f;
+
+	UPROPERTY(EditAnywhere)
+	float timeEnemyRed;
+	bool isTouching = false;
+	float currentTimeEnemyRed = 0.0f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* attackBasic;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* attackSpe;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* getHit;
 
 protected:
 	// Called when the game starts or when spawned
@@ -62,6 +73,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void EnemyDamage(int _damage);
+	UFUNCTION(BlueprintCallable)
+	void EnemyDamage(int _damage, bool attackSpecial = false);
 	
 };

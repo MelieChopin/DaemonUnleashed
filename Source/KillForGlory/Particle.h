@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool isActived = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool toDestroy = false;
 };

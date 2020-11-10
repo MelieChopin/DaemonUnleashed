@@ -3,9 +3,6 @@
 
 #include "KFGPlayerDeamon.h"
 
-#include <xkeycheck.h>
-
-
 #include "Enemy.h"
 #include "KFGPlayerHuman.h"
 #include "Camera/PlayerCameraManager.h"
@@ -41,7 +38,10 @@ void AKFGPlayerDeamon::BeginPlay()
 void AKFGPlayerDeamon::SetHumanForm(AKFGPlayerHuman* _humanForm)
 {
     if(_humanForm != nullptr)
-        humanForm = _humanForm;
+    {
+	    humanForm = _humanForm;
+    	humanForm->DisableAttackHitBox();
+    }
 }
 
 void AKFGPlayerDeamon::Tick(float DeltaTime) 
@@ -74,7 +74,7 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 {
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerDeamon::TransformToHuman);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-    PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed, this, &AKFGPlayerDeamon::BeginCharge);
+  //  PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed, this, &AKFGPlayerDeamon::BeginCharge);
     PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AKFGPlayerDeamon::Attack);
 	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AKFGPlayerDeamon::Special);
     //Call parent
@@ -114,26 +114,19 @@ void AKFGPlayerDeamon::BeginCharge()
 	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || (playerState == EPlayerState::ATTACK && !recoverAttack) || timeStun > 0)
 		return;
 
-	if(recoverAttack)
+	if (playerState == EPlayerState::ATTACK)
 		StopAnimMontage(GetCurrentMontage());
-	changePlayerState(EPlayerState::ROLL);
 	
-	beginLocation = GetActorLocation();
-
-	forwardVector = GetActorForwardVector() * 200;
-	GetCharacterMovement()->Velocity = forwardVector;
-
+	changePlayerState(EPlayerState::ROLL);
 	currentDistance = 0.0f;
+	beginLocation = GetActorLocation();
 	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
 	isCharging = true;
-    GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("BEGINCHARGE"));
+	isFinish = false;
 }
 
 void AKFGPlayerDeamon::Charge()
 {
-	GetCharacterMovement()->Velocity = GetVelocity() + FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
-	forwardVector = FMath::Lerp(forwardVector, GetActorForwardVector() * 200, lerpPercent);
-
 	currentDistance += (beginLocation - GetActorLocation()).Size();
 	beginLocation = GetActorLocation();
 	if (currentDistance >= distanceMax || GetMovementComponent()->IsFalling())
@@ -142,10 +135,23 @@ void AKFGPlayerDeamon::Charge()
 
 void AKFGPlayerDeamon::EndCharge()
 {
-	GetCharacterMovement()->RotationRate = FRotator(0, yawRate, 0);
+	isFinish = true;
 	playerState = EPlayerState::NONE;
 	isCharging = false;
-	GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Red, TEXT("ENDCHARGE"));
+}
+
+void AKFGPlayerDeamon::ChangeRotationRaw()
+{
+	GetCharacterMovement()->RotationRate = FRotator(0,
+		GetCharacterMovement()->RotationRate.Yaw < yawRate ? GetCharacterMovement()->RotationRate.Yaw + 5: yawRate,
+		0);
+}
+
+void AKFGPlayerDeamon::RotationRawInitial()
+{
+	GetCharacterMovement()->RotationRate = FRotator(0,
+        yawRate,
+        0);
 }
 
 void AKFGPlayerDeamon::Attack()
@@ -224,7 +230,7 @@ void AKFGPlayerDeamon::DisableAttackHitBox()
 void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-3, 1, FColor::Blue, "HIT");
+	GEngine->AddOnScreenDebugMessage(-3, 1, FColor::Blue, "HIT DEAMON");
 	if(OtherActor->ActorHasTag("Enemy"))
 	{
 		AEnemy* enemy = Cast<AEnemy>(OtherActor);
@@ -254,7 +260,7 @@ void AKFGPlayerDeamon::Special()
 			FVector launchDir = GetActorLocation() - enemy->GetActorLocation();
 			launchDir *= 2;
 			enemy->LaunchCharacter(FVector(launchDir.X,launchDir.Y,350),true,true);
-			enemy->EnemyDamage(specialDamage);
+			enemy->EnemyDamage(specialDamage, true);
 		}
 	}
 }
@@ -277,13 +283,17 @@ AActor* AKFGPlayerDeamon::findNearestEnemyFromInput()
             
 			FVector inputDir(GetInputAxisValue("MoveForward"),GetInputAxisValue("MoveRight"),0);
 			inputDir.Normalize();
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-			FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
+			if (Controller != nullptr)
+			{
+				FRotator Rotation = Controller->GetControlRotation();
+				FRotator YawRotation(0, Rotation.Yaw, 0);
+
+				FVector Direction = GetActorLocation() + (YawRotation.Quaternion() * inputDir) *150;
             
-			if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
-				enemyTarget = enemy;
+				if(FVector::Dist(enemy->GetActorLocation(),Direction) < FVector::Dist(enemyTarget->GetActorLocation(),Direction))
+					enemyTarget = enemy;
+			}
 		}
 	}
 
