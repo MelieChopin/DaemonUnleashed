@@ -58,12 +58,11 @@ void AEnemy::EnemyDamage(int _damage, bool attackSpecial)
 	if (currentLife > 0)
 	{
 		currentLife -= _damage;
-		
+		GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 0.5f);
+        GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.9f);
+		isTouching = true;
 		if (currentLife > 0 && !attackSpecial)
 		{
-			GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 0.5f);
-         	GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.9f);
-         	isTouching = true;
          	currentTimeEnemyRed = 0.0f;
 			FVector launchDir = GetActorLocation() - GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
             launchDir.Normalize();
