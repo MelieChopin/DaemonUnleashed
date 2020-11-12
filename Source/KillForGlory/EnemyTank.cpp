@@ -52,6 +52,18 @@ void AEnemyTank::Tick(float DeltaTime)
     }
 }
 
+void AEnemyTank::ColorYellow()
+{
+	GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 1.0f);
+    GetMesh()->SetScalarParameterValueOnMaterials("Yellow", 0.3f);
+}
+
+void AEnemyTank::ResetPercentMat()
+{
+    GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 1.0f);
+    GetMesh()->SetScalarParameterValueOnMaterials("Yellow", 0.0f);
+}
+
 void AEnemyTank::enableBasicAttack()
 {
     attackHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -72,7 +84,19 @@ void AEnemyTank::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
     {
         AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
         if(player != nullptr)
-            player->PlayerDamage(damage);
+
+		if (!player->isUntouchable)
+			{
+				player->PlayerDamage(damage);
+				return;
+			}
+			StopAnimMontage(GetCurrentMontage());
+			DisableAttackHitBox();
+			FVector direction = GetActorLocation() - OtherActor->GetActorLocation();
+			direction.Normalize();
+			direction *= player->strengthPushBack;
+			GetCharacterMovement()->Velocity = FVector::ZeroVector;
+			LaunchCharacter(FVector(direction.X, direction.Y,300),true,true);
     }
 }
 

@@ -8,7 +8,7 @@
 
 #include "KFGPlayer.generated.h"
 
-enum class EPlayerState {NONE, ATTACK, ROLL, SPECIAL};
+enum class EPlayerState {NONE, ATTACK, ROLL, SPECIAL, PARADE};
 
 UCLASS(config=Game)
 class AKFGPlayer : public ACharacter
@@ -81,7 +81,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool isUntouchable = false;
 	////
-	
+
+	//// PARADE
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Parade)
+	float timeParade;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Parade)
+	float strengthPushBack;
+	void BeginParade();
+	float timeCurrentParade = 0.0f;
+	////
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayerDamage(int damage);

@@ -62,6 +62,17 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 		}
 	}
 
+	if (playerState == EPlayerState::PARADE)
+	{
+		timeCurrentParade += DeltaTime;
+		if (timeCurrentParade >= timeParade)
+		{
+			StopAnimMontage(parade);
+			playerState = EPlayerState::NONE;
+			isUntouchable = false;
+		}
+	}
+	
 	if (playerState == EPlayerState::ROLL)
 		Charge();
 
@@ -74,11 +85,24 @@ void AKFGPlayerDeamon::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 {
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerDeamon::TransformToHuman);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-  //  PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed, this, &AKFGPlayerDeamon::BeginCharge);
+	PlayerInputComponent->BindAction("Parade", IE_Pressed,this, &AKFGPlayerDeamon::BeginParade);
     PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AKFGPlayerDeamon::Attack);
 	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AKFGPlayerDeamon::Special);
     //Call parent
     Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AKFGPlayerDeamon::BeginParade()
+{
+	if (playerState == EPlayerState::ROLL && playerState == EPlayerState::PARADE && playerState == EPlayerState::SPECIAL)
+		return;
+
+	if (playerState == EPlayerState::ATTACK)
+		StopAnimMontage(GetCurrentMontage());
+
+	timeCurrentParade = 0.0f;
+	PlayAnimMontage(parade);
+	isUntouchable = true;
 }
 
 void AKFGPlayerDeamon::MoveForward(float Value)
