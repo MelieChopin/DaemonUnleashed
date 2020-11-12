@@ -91,7 +91,7 @@ void AEnemyTank::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
 				return;
 			}
 			StopAnimMontage(GetCurrentMontage());
-			DisableAttackHitBox();
+			disableBasicAttack();
 			FVector direction = GetActorLocation() - OtherActor->GetActorLocation();
 			direction.Normalize();
 			direction *= player->strengthPushBack;
