@@ -75,5 +75,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EnemyDamage(int _damage, bool attackSpecial = false);
+
+	//// GameMode Ref
+	int* enemyCount = nullptr;
+	////
 	
 };

@@ -3,6 +3,10 @@
 
 #include "KFGGameMode.h"
 
+
+#include "Enemy.h"
+#include "Engine/Engine.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
 AKFGGameMode::AKFGGameMode()
@@ -19,4 +23,22 @@ void AKFGGameMode::BeginPlay()
 {
     Super::BeginPlay();
     currentLife = maxLife;
+
+    TArray<AActor*> foundEnemy;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+
+    enemyCount = foundEnemy.Num();
+}
+
+void AKFGGameMode::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if(currentLife <= 0)
+        myGameState = EKFGGameState::LOOSE;
+
+    if(enemyCount <= 0)
+        myGameState = EKFGGameState::WIN;
+
+    GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyCount));
 }

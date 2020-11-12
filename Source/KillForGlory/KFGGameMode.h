@@ -4,9 +4,17 @@
 
 #include "CoreMinimal.h"
 
-#include "KFGPlayer.h"
 #include "GameFramework/GameModeBase.h"
 #include "KFGGameMode.generated.h"
+
+UENUM(Blueprintable)
+enum class EKFGGameState : uint8
+{
+	RUN,
+	PAUSE,
+	WIN,
+	LOOSE,
+};
 
 /**
  * 
@@ -20,6 +28,7 @@ public:
 	AKFGGameMode();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	//// PLAYER STAT
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
@@ -31,5 +40,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
 	float transformRatioSpeed = 0;
 	////
+	
+	//// Game managment
+	UPROPERTY(BlueprintReadWrite)
+	EKFGGameState myGameState = EKFGGameState::RUN;
+	int enemyCount = 0;
 	
 };

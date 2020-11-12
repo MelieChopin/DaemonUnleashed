@@ -3,6 +3,8 @@
 
 #include "Enemy.h"
 
+
+#include "KFGGameMode.h"
 #include "KFGPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -10,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/MovementComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -23,7 +26,8 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	enemyCount = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->enemyCount;
 }
 
 // Called every frame
@@ -73,7 +77,10 @@ void AEnemy::EnemyDamage(int _damage, bool attackSpecial)
 	}
 		
 	if (currentLife <= 0)
+	{
 		Destroy();
+		*enemyCount -= 1;
+	}
 	
 	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(currentLife));
 }

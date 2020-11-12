@@ -3,13 +3,12 @@
 
 #include "EnemyPopcorn.h"
 
-#include <xkeycheck.h>
-
 
 #include "KFGGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/Engine.h"
+#include "KFGPlayer.h"
 
 class AKFGPlayer;
 // Sets default values

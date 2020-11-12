@@ -154,9 +154,6 @@ void AKFGPlayer::PlayerDamage(int damage)
 		GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 0.5f);
 		GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.9f);
 	}
-		
-	if(*currentLife <= 0)
-		UGameplayStatics::OpenLevel(GetWorld(),"MainMenu");
 }
 
 
