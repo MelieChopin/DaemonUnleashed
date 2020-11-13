@@ -47,6 +47,9 @@ public:
 	UAnimMontage* combo2Anim;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* combo3Anim;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+	UAnimMontage* parade;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
 	UAnimMontage* rollAnim;
@@ -60,6 +63,10 @@ public:
 	UBoxComponent* attackHitBox;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	UBoxComponent* specialHitBox;
+	////
+
+	//// PARADE
+	void BeginParade();
 	////
 	
 	//// Event
@@ -97,7 +104,7 @@ public:
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	////
 
-	//// WALLJUMp
+	//// WALLJUMP
 	bool isFreeze = false;
 	float timeForWallJump = 0.0f;
 	FVector normal;

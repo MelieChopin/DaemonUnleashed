@@ -9,6 +9,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Engine/Engine.h"
 #include "KFGPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 class AKFGPlayer;
 // Sets default values
@@ -83,10 +84,22 @@ void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 {
 	if(OtherActor->ActorHasTag("Player") && OtherComp->ComponentHasTag("Body") && !isTouching)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red, OtherComp->GetName());
 		AKFGPlayer* player = Cast<AKFGPlayer>(OtherActor);
 		if(player != nullptr)
-			player->PlayerDamage(damage);
+		{
+			if (!player->isUntouchable)
+			{
+				player->PlayerDamage(damage);
+				return;
+			}
+			/*StopAnimMontage(GetCurrentMontage());
+			DisableAttackHitBox();
+			FVector direction = GetActorLocation() - OtherActor->GetActorLocation();
+			direction.Normalize();
+			direction *= player->strengthPushBack;
+			GetCharacterMovement()->Velocity = FVector::ZeroVector;
+			LaunchCharacter(FVector(direction.X, direction.Y,300),true,true);*/
+		}
 	}
 }
 

@@ -46,7 +46,14 @@ public:
     UAnimMontage* combo1Anim;
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
     UAnimMontage* combo2Anim;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Anim)
+    UAnimMontage* parade;
     ///
+
+    //// PARADE
+    void BeginParade();
+    ////
     
     //// ATTACK
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)

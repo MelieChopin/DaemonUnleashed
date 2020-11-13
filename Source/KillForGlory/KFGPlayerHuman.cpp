@@ -84,6 +84,17 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
         currentCooldownSpecialAttack -= DeltaTime;
     }
 
+    if (playerState == EPlayerState::PARADE)
+    {
+        timeCurrentParade += DeltaTime;
+        if (timeCurrentParade >= timeParade)
+        {
+            StopAnimMontage(parade);
+            playerState = EPlayerState::NONE;
+            isUntouchable = false;
+        }
+    }
+    
     if(playerState == EPlayerState::SPECIAL)
     {
         TArray<AActor*> overlappedEnemyList;
@@ -96,6 +107,7 @@ void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 {
     PlayerInputComponent->BindAction("Roll_Charge", IE_Pressed,this, &AKFGPlayerHuman::Roll);
     PlayerInputComponent->BindAction("Attack", IE_Pressed,this, &AKFGPlayerHuman::Attack);
+    PlayerInputComponent->BindAction("Parade", IE_Pressed,this, &AKFGPlayerHuman::BeginParade);
     PlayerInputComponent->BindAction("Transform", IE_Pressed, this, &AKFGPlayerHuman::TransformToDeamon);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AKFGPlayerHuman::Jumping);
     PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AKFGPlayerHuman::Special);
@@ -103,6 +115,18 @@ void AKFGPlayerHuman::SetupPlayerInputComponent(class UInputComponent* PlayerInp
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void AKFGPlayerHuman::BeginParade()
+{
+    if (playerState == EPlayerState::ROLL && playerState == EPlayerState::PARADE && playerState == EPlayerState::SPECIAL)
+        return;
+
+    if (playerState == EPlayerState::ATTACK)
+        StopAnimMontage(GetCurrentMontage());
+
+    timeCurrentParade = 0.0f;
+    PlayAnimMontage(parade);
+    isUntouchable = true;
+}
 
 void AKFGPlayerHuman::MoveForward(float Value)
 {

@@ -62,4 +62,9 @@ public:
 	float specialDamage = 0;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=EnemyTank)
 	float specialStun = 0;
+
+	UFUNCTION(BlueprintCallable)
+    void ResetPercentMat();
+	UFUNCTION(BlueprintCallable)
+    void ColorYellow();
 };
