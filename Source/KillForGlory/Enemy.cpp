@@ -71,7 +71,7 @@ void AEnemy::EnemyDamage(int _damage, bool attackSpecial)
 			FVector launchDir = GetActorLocation() - GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
             launchDir.Normalize();
             launchDir *= strengthPushBack;
-			GetCharacterMovement()->Velocity = FVector::ZeroVector;
+			GetCharacterMovement()->Velocity = - FVector::UpVector * 10;
             LaunchCharacter(FVector(launchDir.X, launchDir.Y,300),true,true);
 		}
 	}

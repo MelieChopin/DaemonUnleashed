@@ -2,9 +2,12 @@
 
 
 #include "EnemyManager.h"
+
+#include "KFGGameMode.h"
 #include "Engine/Engine.h"
 #include "Math/UnrealMathUtility.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -18,6 +21,7 @@ AEnemyManager::AEnemyManager()
 void AEnemyManager::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
 	int xMin, xMax, yMin, yMax;
 	xMin = GetActorLocation().X - sizeSpawn;
@@ -25,12 +29,16 @@ void AEnemyManager::BeginPlay()
 	yMin = GetActorLocation().Y - sizeSpawn;
 	yMax = yMin + 2 * sizeSpawn;
 	
+	int* enemyCount = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->enemyCount;
+
 	for (int i = 0; i < numberOfEnemies; i++)
 	{
 		FVector newPosition(FMath::RandRange(xMin, xMax), FMath::RandRange(yMin, yMax), GetActorLocation().Z);
 		GEngine->AddOnScreenDebugMessage(-3, 1.0f, FColor::Black, newPosition.ToString());
 		GetWorld()->SpawnActor<AActor>(enemyClass.Get(), GetActorLocation(), FRotator::ZeroRotator);
-	}	
+	}
+	
+	*enemyCount += numberOfEnemies;
 }
 
 // Called every frame
