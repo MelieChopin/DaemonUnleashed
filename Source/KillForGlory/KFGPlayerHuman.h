@@ -115,6 +115,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	USphereComponent* wallJumpSphereCollision;
 
+	UFUNCTION(BlueprintCallable)
+    void EnableWallJump();
+	UFUNCTION(BlueprintCallable)
+    void DisableWallJump();
+	
 	UFUNCTION()
     void OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                             int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

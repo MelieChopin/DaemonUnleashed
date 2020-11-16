@@ -342,9 +342,9 @@ void AKFGPlayerHuman::Jumping()
 void AKFGPlayerHuman::OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (!OtherActor->ActorHasTag("WallJump"))
+    if (!OtherActor->ActorHasTag("WallJump") && OtherActor == this)
         return;
-
+    
     FCollisionQueryParams TraceParams;
     FHitResult hit;
 
@@ -360,6 +360,20 @@ void AKFGPlayerHuman::OnWallJumpBeginOverlap(UPrimitiveComponent* OverlappedComp
         isFreeze = true;
     }
 }
+
+void AKFGPlayerHuman::EnableWallJump()
+{
+    wallJumpSphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AKFGPlayerHuman::DisableWallJump()
+{
+    GetCharacterMovement()->GravityScale = 1.0f;
+    isFreeze = false;
+    timeForWallJump = 0.0f;
+    wallJumpSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 void AKFGPlayerHuman::OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
                 class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
