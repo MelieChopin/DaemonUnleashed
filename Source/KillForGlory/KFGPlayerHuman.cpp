@@ -56,14 +56,8 @@ void AKFGPlayerHuman::Tick(float DeltaTime)
         deamonForm->SetActorTransform(GetActorTransform());
         deamonForm->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 
-        if(*transformRatio > 0)
-            *transformRatio -= DeltaTime * *transformRatioSpeed;
-
-        if(*transformRatio <= 0)
-        {
-            TransformToDeamon();
-            return;
-        }
+        if(*deamonResources < 1)
+            *deamonResources += DeltaTime * *deamonResourcesSpeedIncrease;
     }
     
     if (isFreeze)

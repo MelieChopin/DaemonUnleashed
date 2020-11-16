@@ -36,9 +36,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int currentLife = 0;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	float transformRatio = 0;
+	float deamonResources = 0;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
-	float transformRatioSpeed = 0;
+	float deamonResourcesSpeedDecrease = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=PlayerStat)
+	float deamonResourcesSpeedIncrease = 0;
 	////
 	
 	//// Game managment
