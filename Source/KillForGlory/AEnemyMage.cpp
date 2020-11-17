@@ -3,14 +3,10 @@
 
 #include "AEnemyMage.h"
 
-
-#include <xkeycheck.h>
-#include <xkeycheck.h>
-
-
 #include "Particle.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 AAEnemyMage::AAEnemyMage()
 {
@@ -86,7 +82,11 @@ void AAEnemyMage::CreateMagicBall()
     AParticle* particle = Cast<AParticle>(temp);
     if (particle != nullptr)
     {
-        particle->direction = GetActorForwardVector();
+        FVector newDirection = GetActorForwardVector();
+        FVector zDirection = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation() - GetActorLocation();
+        zDirection.Normalize();
+        newDirection.Z = zDirection.Z;
+        particle->direction = newDirection;
         particle->damage = damage;
     }
 }
