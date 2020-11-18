@@ -10,6 +10,8 @@
 
 AEnemyTank::AEnemyTank()
 {
+    PrimaryActorTick.bCanEverTick = true;
+    
     attackHitBox = CreateDefaultSubobject<UBoxComponent>("basicAttackHitBox");
     attackHitBox->SetupAttachment(RootComponent);
     
@@ -41,7 +43,7 @@ void AEnemyTank::Tick(float DeltaTime)
     if (isTouching)
         ResetPercentMat();
     
-    if(isAttacking && !isDead)
+    if(isAttacking && changeIsAttacking <= 0 && !isDead)
     {
         if(currentSpecialCooldown <= 0)
         {
@@ -50,8 +52,16 @@ void AEnemyTank::Tick(float DeltaTime)
         }
         else
             PlayAnimMontage(attackBasic);
-
-        isAttacking = false;
+    }
+    
+    if(isAttacking)
+    {
+        changeIsAttacking += DeltaTime;
+        if (changeIsAttacking >= timeAnimAttack)
+        {
+            changeIsAttacking = 0.0f;
+            isAttacking = false;
+        }
     }
 }
 
@@ -103,7 +113,7 @@ void AEnemyTank::startSpecialAttack()
 
 void AEnemyTank::stopSpecialAttack()
 {
-    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
     isAttacking = false;
 }
 

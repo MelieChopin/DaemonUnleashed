@@ -57,8 +57,9 @@ void AKFGPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	currentLife = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->currentLife;
-	transformRatio = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->transformRatio;
-	transformRatioSpeed = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->transformRatioSpeed;
+	deamonResources = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->deamonResources;
+	deamonResourcesSpeedDecrease = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->deamonResourcesSpeedDecrease;
+	deamonResourcesSpeedIncrease = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->deamonResourcesSpeedIncrease;
 
 	if(currentLife == nullptr)
 		EndPlay(EEndPlayReason::Quit);

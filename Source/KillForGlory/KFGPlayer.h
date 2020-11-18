@@ -101,8 +101,9 @@ public:
 
 	//// Player Stat
 	int* currentLife = nullptr; // Point on currentLife KFGGameMode
-	float* transformRatio = nullptr; // Point on transformRatio in KFGGameMode
-	float* transformRatioSpeed = nullptr; // Point on transformRatioSpeed in KFGGameMode
+	float* deamonResources = nullptr; // Point on deamonResources in KFGGameMode
+	float* deamonResourcesSpeedDecrease = nullptr; // Point on deamonResourcesSpeedDecrease in KFGGameMode
+	float* deamonResourcesSpeedIncrease = nullptr; // Point on deamonResourcesSpeedIncrease in KFGGameMode
 	UPROPERTY(BlueprintReadOnly)
 	float timeStun = 0; // if = 0 not stun else stun
 	////

@@ -52,10 +52,10 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 	{
 		humanForm->SetActorTransform(GetActorTransform());
 
-		if(*transformRatio < 1)
-			*transformRatio += DeltaTime * *transformRatioSpeed;
+		if(*deamonResources > 0)
+			*deamonResources -= DeltaTime * *deamonResourcesSpeedDecrease;
 
-		if(*transformRatio >= 1)
+		if(*deamonResources <= 0)
 		{
 			TransformToHuman();
 			return;

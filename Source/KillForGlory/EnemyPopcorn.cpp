@@ -22,7 +22,6 @@ AEnemyPopcorn::AEnemyPopcorn()
 
 	boxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
 	boxCollision->SetupAttachment(RootComponent);
-	
 }
 
 // Called when the game starts or when spawned
