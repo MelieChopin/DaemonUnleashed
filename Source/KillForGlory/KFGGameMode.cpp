@@ -40,5 +40,5 @@ void AKFGGameMode::Tick(float DeltaTime)
     if(enemyCount <= 0)
         myGameState = EKFGGameState::WIN;
 
-    GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyCount));
+    //GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyCount));
 }

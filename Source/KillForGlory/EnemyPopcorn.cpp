@@ -47,7 +47,7 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	if (isFollowingPlayer)
 		timeAttack += DeltaTime;
 
-	if (isAttacking)
+	if (isAttacking && !isDead)
 	{
 		if (changeIsAttacking <= 0.1)
 			PlayAnimMontage(attackBasic);
@@ -92,13 +92,6 @@ void AEnemyPopcorn::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* 
 				player->PlayerDamage(damage);
 				return;
 			}
-			/*StopAnimMontage(GetCurrentMontage());
-			DisableAttackHitBox();
-			FVector direction = GetActorLocation() - OtherActor->GetActorLocation();
-			direction.Normalize();
-			direction *= player->strengthPushBack;
-			GetCharacterMovement()->Velocity = FVector::ZeroVector;
-			LaunchCharacter(FVector(direction.X, direction.Y,300),true,true);*/
 		}
 	}
 }

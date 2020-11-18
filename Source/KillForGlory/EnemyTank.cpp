@@ -37,8 +37,11 @@ void AEnemyTank::Tick(float DeltaTime)
         timeAttack += DeltaTime;
         currentSpecialCooldown -= DeltaTime;
     }
+
+    if (isTouching)
+        ResetPercentMat();
     
-    if(isAttacking)
+    if(isAttacking && !isDead)
     {
         if(currentSpecialCooldown <= 0)
         {
@@ -86,17 +89,10 @@ void AEnemyTank::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
         if(player != nullptr)
 
 		if (!player->isUntouchable)
-			{
-				player->PlayerDamage(damage);
-				return;
-			}
-			/*StopAnimMontage(GetCurrentMontage());
-			disableBasicAttack();
-			FVector direction = GetActorLocation() - OtherActor->GetActorLocation();
-			direction.Normalize();
-			direction *= player->strengthPushBack;
-			GetCharacterMovement()->Velocity = FVector::ZeroVector;
-			LaunchCharacter(FVector(direction.X, direction.Y,300),true,true);*/
+		{
+		    player->PlayerDamage(damage);
+		    return;
+		}
     }
 }
 

@@ -40,7 +40,7 @@ void AAEnemyMage::Tick(float DeltaTime)
         cooldown -= DeltaTime;
     }
 
-    if (cooldown <= 0.0f && numberOfUses > 0 && changeIsAttacking != 0.0f)
+    if (cooldown <= 0.0f && numberOfUses > 0 && changeIsAttacking != 0.0f && !isDead)
     {
         if (timeInvocation <= 0.1)
             PlayAnimMontage(attackSpe);
@@ -59,7 +59,7 @@ void AAEnemyMage::Tick(float DeltaTime)
         return;
     }
 
-    if (isAttacking)
+    if (isAttacking && !isDead)
     {
         if (changeIsAttacking <= 0.1)
             PlayAnimMontage(attackBasic);

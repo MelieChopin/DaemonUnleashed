@@ -79,5 +79,6 @@ public:
 	//// GameMode Ref
 	int* enemyCount = nullptr;
 	////
-	
+
+	bool isDead = false;
 };

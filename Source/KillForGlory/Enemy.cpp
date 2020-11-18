@@ -76,9 +76,9 @@ void AEnemy::EnemyDamage(int _damage, bool attackSpecial)
 		}
 	}
 		
-	if (currentLife <= 0)
+	if (currentLife <= 0 && !isDead)
 	{
-		Destroy();
+		isDead = true;
 		*enemyCount -= 1;
 	}
 	
