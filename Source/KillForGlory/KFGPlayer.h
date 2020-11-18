@@ -6,6 +6,9 @@
 
 #include "CoreMinimal.h"
 
+#include "Sound/SoundCue.h"
+
+
 #include "KFGPlayer.generated.h"
 
 enum class EPlayerState {NONE, ATTACK, ROLL, SPECIAL, PARADE};
@@ -103,7 +106,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float timeStun = 0; // if = 0 not stun else stun
 	////
-
+	///
+	UPROPERTY(EditAnywhere)
+	USoundCue* hitsound;
+	
 	EPlayerState playerState = EPlayerState::NONE;
 
 	virtual void Tick(float DeltaTime) override;

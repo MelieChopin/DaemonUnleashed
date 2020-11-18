@@ -151,6 +151,7 @@ void AKFGPlayer::PlayerDamage(int damage)
 	{
 		*currentLife -= damage;
 		isUntouchable = true;
+		UGameplayStatics::PlaySound2D(GetWorld(), hitsound);
 		GetMesh()->SetScalarParameterValueOnMaterials("PercentForBasicColor", 0.5f);
 		GetMesh()->SetScalarParameterValueOnMaterials("PercentForRed", 0.9f);
 	}

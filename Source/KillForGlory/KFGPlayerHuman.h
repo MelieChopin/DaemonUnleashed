@@ -115,6 +115,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Collision)
 	USphereComponent* wallJumpSphereCollision;
 
+	float gravityScale;
+	
 	UFUNCTION(BlueprintCallable)
     void EnableWallJump();
 	UFUNCTION(BlueprintCallable)

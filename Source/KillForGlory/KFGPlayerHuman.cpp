@@ -45,6 +45,7 @@ void AKFGPlayerHuman::BeginPlay()
     deamonForm->SetActorEnableCollision(false);
 
     isPossessed = true;
+    gravityScale = GetCharacterMovement()->GravityScale;
 }
 
 void AKFGPlayerHuman::Tick(float DeltaTime)
@@ -330,7 +331,7 @@ void AKFGPlayerHuman::Jumping()
 {
     if (isFreeze)
     {
-        GetCharacterMovement()->GravityScale = 1.0f;
+        GetCharacterMovement()->GravityScale = gravityScale;
         GetCharacterMovement()->Velocity = FVector(normal * FVector(400, 400, 0) + FVector(0, 0, 800));
         isFreeze = false;
         return;
@@ -368,7 +369,7 @@ void AKFGPlayerHuman::EnableWallJump()
 
 void AKFGPlayerHuman::DisableWallJump()
 {
-    GetCharacterMovement()->GravityScale = 1.0f;
+    GetCharacterMovement()->GravityScale = gravityScale;
     isFreeze = false;
     timeForWallJump = 0.0f;
     wallJumpSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -378,7 +379,7 @@ void AKFGPlayerHuman::DisableWallJump()
 void AKFGPlayerHuman::OnWallJumpEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
                 class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    GetCharacterMovement()->GravityScale = 1.0f;
+    GetCharacterMovement()->GravityScale = gravityScale;
     isFreeze = false;
     timeForWallJump = 0.0f;
 }
