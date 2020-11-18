@@ -16,12 +16,10 @@ bool UCanAttackPlayer::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerC
     {
         FVector enemyLocation = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation();
         FVector playerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-        FVector dist = enemyLocation - playerLocation;
-
-        if (dist.Size() <= enemy->distanceWaitToAttackPlayer + 35)
-            return true;
+        
+        if (FVector::Dist(enemyLocation,playerLocation) > enemy->distanceWaitToAttackPlayer + 60.f)
+            return false;
     }
    
-    return false;
+    return true;
 }

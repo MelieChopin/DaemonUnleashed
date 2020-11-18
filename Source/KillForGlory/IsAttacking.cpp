@@ -5,11 +5,12 @@
 
 #include "AIController.h"
 #include "Enemy.h"
+#include "Engine/Engine.h"
 
 bool UIsAttacking::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
     AEnemy* enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-
+    
     if (enemy != nullptr)
         if (enemy->isAttacking)
             return true;
