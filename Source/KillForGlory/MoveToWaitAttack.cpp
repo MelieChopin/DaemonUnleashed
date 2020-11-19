@@ -34,6 +34,9 @@ EBTNodeResult::Type UMoveToWaitAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 
     //DrawDebugLine(GetWorld(), enemyLocation, playerLocation, FColor::Red, false, 0.05f,0,10);
 
+    if(result.GetActor() == nullptr)
+        return EBTNodeResult::Failed;
+
     enemy->isFollowingPlayer = true;
 
     if (result.GetActor()->ActorHasTag("Player"))
