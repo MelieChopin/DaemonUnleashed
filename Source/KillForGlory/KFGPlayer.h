@@ -107,7 +107,14 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float timeStun = 0; // if = 0 not stun else stun
 	////
-	///
+
+	//// Movement
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Movement)
+	float fallSpeed;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Movement)
+	float fallSpeedRise;
+	////
+	
 	UPROPERTY(EditAnywhere)
 	USoundCue* hitsound;
 	

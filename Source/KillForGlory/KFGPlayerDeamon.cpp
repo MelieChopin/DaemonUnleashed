@@ -297,7 +297,7 @@ AActor* AKFGPlayerDeamon::findNearestEnemyFromInput()
 	AActor* enemyTarget = nullptr;
 	for(AActor* enemy : foundEnemy)
 	{
-		if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f)
+		if(FVector::Dist(enemy->GetActorLocation(),GetActorLocation()) <= 350.f && !Cast<AEnemy>(enemy)->isDead)
 		{
 			if(enemyTarget == nullptr)
 			{

@@ -82,6 +82,9 @@ void AKFGPlayer::Tick(float DeltaTime)
 
 	if(timeStun > 0)
 		timeStun -= DeltaTime;
+
+	if(GetCharacterMovement()->IsFalling() && GetCharacterMovement()->Velocity.Z < 0)
+		GetCharacterMovement()->Velocity.Z =  FMath::Lerp(GetCharacterMovement()->Velocity.Z,fallSpeed,fallSpeedRise);
 }
 
 //////////////////////////////////////////////////////////////////////////
