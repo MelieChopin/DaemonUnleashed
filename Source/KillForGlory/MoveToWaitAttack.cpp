@@ -23,6 +23,10 @@ EBTNodeResult::Type UMoveToWaitAttack::ExecuteTask(UBehaviorTreeComponent& Owner
 
 
     FVector distEnemyPlayer  = playerLocation - enemyLocation;
+
+    if(distEnemyPlayer.Size() > enemy->distanceToFocusPlayer)
+        return EBTNodeResult::Failed;
+    
     FVector distRadiusPlayer = (distEnemyPlayer * -1).GetSafeNormal() * enemy->distanceWaitToAttackPlayer;
     FVector targetPos = (distEnemyPlayer + distRadiusPlayer) + enemyLocation;
 
