@@ -260,6 +260,7 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 		AEnemy* enemy = Cast<AEnemy>(OtherActor);
 		if(enemy != nullptr)
 			enemy->EnemyDamage(attackDamage);
+		*currentLife += lifeSteal;
 	}
 }
 
