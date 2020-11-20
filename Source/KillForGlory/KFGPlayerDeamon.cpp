@@ -260,7 +260,7 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 		AEnemy* enemy = Cast<AEnemy>(OtherActor);
 		if(enemy != nullptr)
 			enemy->EnemyDamage(attackDamage);
-		*currentLife += attackDamage * percentLifeSteal;
+		*currentLife += lifeSteal;
 	}
 }
 
@@ -286,7 +286,6 @@ void AKFGPlayerDeamon::Special()
 			launchDir *= 2;
 			enemy->LaunchCharacter(FVector(launchDir.X,launchDir.Y,350),true,true);
 			enemy->EnemyDamage(specialDamage, true);
-			*currentLife += specialDamage * percentLifeSteal;
 		}
 	}
 }

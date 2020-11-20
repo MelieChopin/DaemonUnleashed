@@ -127,7 +127,7 @@ public:
     ////
 
     UPROPERTY(EditAnywhere)
-    float percentLifeSteal;
+    int lifeSteal;
     
     bool isPossessed;
 
