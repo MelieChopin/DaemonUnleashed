@@ -63,6 +63,10 @@ void AEnemyTank::Tick(float DeltaTime)
             isAttacking = false;
         }
     }
+
+    if(!isAttacking && GetCharacterMovement()->GetMovementName() == "Flying")
+        GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+
 }
 
 void AEnemyTank::ColorYellow()

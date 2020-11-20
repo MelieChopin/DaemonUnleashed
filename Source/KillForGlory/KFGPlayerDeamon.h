@@ -117,6 +117,7 @@ public:
     void Special();
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
     float cooldownSpecialAttack = 0;
+    UPROPERTY(BlueprintReadOnly)
     float currentCooldownSpecialAttack = 0;
     
     //// PlayerStat

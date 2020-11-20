@@ -147,6 +147,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Special)
 	float cooldownSpecialAttack = 0;
+	UPROPERTY(BlueprintReadOnly)
 	float currentCooldownSpecialAttack = 0;
 	void SpecialActorOverlapped(const TArray<AActor*>& enemyList); // Called every frame during special attack
 
