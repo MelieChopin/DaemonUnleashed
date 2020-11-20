@@ -126,6 +126,9 @@ public:
     int specialDamage = 0;
     ////
 
+    UPROPERTY(EditAnywhere)
+    float percentLifeSteal;
+    
     bool isPossessed;
 
     AActor* findNearestEnemyFromInput();
