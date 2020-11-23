@@ -191,6 +191,7 @@ void AKFGPlayerHuman::TransformToDeamon()
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
         isPossessed = false;
         deamonForm->isPossessed = true;
+        GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(cameraShakeTransformation, 1.0f);
     }
 }
 
@@ -328,6 +329,7 @@ void AKFGPlayerHuman::Jumping()
         GetCharacterMovement()->GravityScale = gravityScale;
         GetCharacterMovement()->Velocity = FVector(normal * FVector(400, 400, 0) + FVector(0, 0, 800));
         isFreeze = false;
+        UGameplayStatics::PlaySound2D(GetWorld(), soundJump);
         return;
     }
 	

@@ -6,6 +6,8 @@
 
 #include "CoreMinimal.h"
 
+
+#include "Camera/CameraShake.h"
 #include "Sound/SoundCue.h"
 
 
@@ -114,6 +116,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Movement)
 	float fallSpeedRise;
 	////
+
+	UPROPERTY(EditAnywhere, Category=CameraShake)
+	TSubclassOf<UCameraShake> cameraShakeStun;
+	UPROPERTY(EditAnywhere, Category=CameraShake)
+	TSubclassOf<UCameraShake> cameraShakeTransformation;
+	
 	
 	UPROPERTY(EditAnywhere)
 	USoundCue* hitsound;

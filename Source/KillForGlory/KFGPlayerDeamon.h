@@ -77,34 +77,6 @@ public:
     ///
     
 
-    //// CHARGE
-    UPROPERTY(EditAnywhere, Category=Charge)
-    float distanceMax;
-    UPROPERTY(BlueprintReadWrite, Category=Charge)
-    bool isCharging;
-    UPROPERTY(BlueprintReadWrite, Category=Charge)
-    bool isFinish;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Charge)
-    float trajectoryAdjustment;
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Charge)
-    int damageCharge;
-    
-    FVector forwardVector;
-    FVector beginLocation;
-    float currentDistance = 0.0f;
-    float yawRate;
-
-    UFUNCTION(BlueprintCallable)
-    void BeginCharge();
-    void Charge();
-    UFUNCTION(BlueprintCallable)
-    void EndCharge();
-    UFUNCTION(BlueprintCallable)
-    void ChangeRotationRaw();
-    UFUNCTION(BlueprintCallable)
-    void RotationRawInitial();
-    ////
-
     // Basic attack
     bool bufferAttack = false;
     UPROPERTY(BlueprintReadWrite)
@@ -127,6 +99,12 @@ public:
     int specialDamage = 0;
     ////
 
+    UPROPERTY(EditAnywhere, Category=CameraShake)
+    TSubclassOf<UCameraShake> cameraShakeSpecial;
+    UPROPERTY(EditAnywhere, Category=CameraShake)
+    TSubclassOf<UCameraShake> cameraShakeBasic;
+    
+    
     UPROPERTY(EditAnywhere)
     int lifeSteal;
     

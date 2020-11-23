@@ -164,5 +164,6 @@ void AKFGPlayer::PlayerDamage(int damage)
 
 void AKFGPlayer::PlayerStun(float _timeStun)
 {
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(cameraShakeStun, 1.0f);
 	timeStun = _timeStun;
 }

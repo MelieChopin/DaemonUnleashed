@@ -23,7 +23,6 @@ AKFGPlayerDeamon::AKFGPlayerDeamon()
     attackHitBox->SetupAttachment(RootComponent);
 	attackHitBox->OnComponentBeginOverlap.AddDynamic(this, &AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap);
 
-	yawRate = GetCharacterMovement()->RotationRate.Yaw;
 }
 
 
@@ -72,9 +71,6 @@ void AKFGPlayerDeamon::Tick(float DeltaTime)
 			isUntouchable = false;
 		}
 	}
-	
-	if (playerState == EPlayerState::ROLL)
-		Charge();
 
 	if(currentCooldownSpecialAttack > 0 && playerState != EPlayerState::SPECIAL)
 		currentCooldownSpecialAttack -= DeltaTime;
@@ -133,50 +129,7 @@ void AKFGPlayerDeamon::MoveRight(float Value)
 	}
 }
 
-void AKFGPlayerDeamon::BeginCharge()
-{
-	if (playerState == EPlayerState::ROLL || GetMovementComponent()->IsFalling() || (playerState == EPlayerState::ATTACK && !recoverAttack) || timeStun > 0)
-		return;
 
-	if (playerState == EPlayerState::ATTACK)
-		StopAnimMontage(GetCurrentMontage());
-	
-	changePlayerState(EPlayerState::ROLL);
-	currentDistance = 0.0f;
-	beginLocation = GetActorLocation();
-	GetCharacterMovement()->RotationRate = FRotator(0, trajectoryAdjustment, 0);
-	isCharging = true;
-	isFinish = false;
-}
-
-void AKFGPlayerDeamon::Charge()
-{
-	currentDistance += (beginLocation - GetActorLocation()).Size();
-	beginLocation = GetActorLocation();
-	if (currentDistance >= distanceMax || GetMovementComponent()->IsFalling())
-		EndCharge();
-}
-
-void AKFGPlayerDeamon::EndCharge()
-{
-	isFinish = true;
-	playerState = EPlayerState::NONE;
-	isCharging = false;
-}
-
-void AKFGPlayerDeamon::ChangeRotationRaw()
-{
-	GetCharacterMovement()->RotationRate = FRotator(0,
-		GetCharacterMovement()->RotationRate.Yaw < yawRate ? GetCharacterMovement()->RotationRate.Yaw + 5: yawRate,
-		0);
-}
-
-void AKFGPlayerDeamon::RotationRawInitial()
-{
-	GetCharacterMovement()->RotationRate = FRotator(0,
-        yawRate,
-        0);
-}
 
 void AKFGPlayerDeamon::Attack()
 {
@@ -262,6 +215,7 @@ void AKFGPlayerDeamon::OnAttackHitBoxBeginOverlap(UPrimitiveComponent* Overlappe
 			enemy->EnemyDamage(attackDamage);
 		*currentLife += lifeSteal;
 	}
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(cameraShakeBasic, 1.0f);
 }
 
 void AKFGPlayerDeamon::Special()
@@ -288,6 +242,7 @@ void AKFGPlayerDeamon::Special()
 			enemy->EnemyDamage(specialDamage, true);
 		}
 	}
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(cameraShakeSpecial, 1.0f);
 }
 
 AActor* AKFGPlayerDeamon::findNearestEnemyFromInput()
@@ -334,8 +289,6 @@ void AKFGPlayerDeamon::changePlayerState(EPlayerState newPlayerState)
 	{
 	case EPlayerState::ATTACK:
 		AttackReset(); break;
-	case EPlayerState::ROLL:
-        EndCharge(); break;
 	case EPlayerState::SPECIAL: break;
 	case EPlayerState::NONE: break;
 	default: ;
@@ -365,6 +318,7 @@ void AKFGPlayerDeamon::TransformToHuman()
         GetWorld()->GetFirstPlayerController()->RotationInput = camRotation-playerRotation;
     	isPossessed = false;
     	humanForm->isPossessed = true;
+    	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(cameraShakeTransformation, 1.0f);
     }
 }
 

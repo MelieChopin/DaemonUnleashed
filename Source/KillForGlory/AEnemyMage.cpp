@@ -29,7 +29,7 @@ void AAEnemyMage::Tick(float DeltaTime)
         changeIsAttacking = 0.0f;
         timeInvocation = 0.0f;
         if (listInvocation.Num() != 0)
-            for (int i = 0; i < listInvocation.Num(); i++)
+            while (listInvocation.Num() != 0)
                 listInvocation.RemoveAt(0);
         return;
     }
