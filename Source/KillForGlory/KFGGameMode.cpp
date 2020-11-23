@@ -50,9 +50,4 @@ void AKFGGameMode::Tick(float DeltaTime)
 
     if(enemyList.Num() <= 0)
         myGameState = EKFGGameState::WIN;
-
-    //GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyList.Num()));
-
-    for(auto test : enemyList)
-        GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,test->GetName());
 }
