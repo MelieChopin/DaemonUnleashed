@@ -41,7 +41,11 @@ void AEnemyTank::Tick(float DeltaTime)
     }
 
     if (isTouching)
+    {
         ResetPercentMat();
+        disableSpecialAttack();
+        disableBasicAttack();
+    }
     
     if(isAttacking && changeIsAttacking <= 0 && !isDead)
     {

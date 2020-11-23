@@ -74,7 +74,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
-	void EnemyDamage(int _damage, bool attackSpecial = false);
+	virtual void EnemyDamage(int _damage, bool attackSpecial = false);
 
 	bool isDead = false;
 };

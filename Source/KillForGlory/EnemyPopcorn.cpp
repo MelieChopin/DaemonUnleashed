@@ -40,6 +40,7 @@ void AEnemyPopcorn::Tick(float DeltaTime)
 	if (isTouching)
 	{
 		StopAnimMontage(attackBasic);
+		DisableAttackHitBox();
 		return;
 	}
 	
