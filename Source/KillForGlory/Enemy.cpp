@@ -6,7 +6,7 @@
 
 #include "KFGGameMode.h"
 #include "KFGPlayer.h"
-#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -26,8 +26,6 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	enemyCount = &Cast<AKFGGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->enemyCount;
 }
 
 // Called every frame
@@ -79,7 +77,7 @@ void AEnemy::EnemyDamage(int _damage, bool attackSpecial)
 	if (currentLife <= 0 && !isDead)
 	{
 		isDead = true;
-		*enemyCount -= 1;
+		GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	}
 	
 	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(currentLife));

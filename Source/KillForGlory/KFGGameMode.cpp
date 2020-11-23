@@ -3,7 +3,6 @@
 
 #include "KFGGameMode.h"
 
-
 #include "Enemy.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,21 +23,33 @@ void AKFGGameMode::BeginPlay()
     Super::BeginPlay();
     currentLife = maxLife;
 
-    TArray<AActor*> foundEnemy;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(),foundEnemy);
+    TArray<AActor*> winZoneSearch;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(),"WinZone",winZoneSearch);
 
-    enemyCount = foundEnemy.Num();
+    if(winZoneSearch.Num() <= 0)
+    {
+        UKismetSystemLibrary::QuitGame(GetWorld(),nullptr,EQuitPreference::Quit,true);
+        return;
+    }
+
+    winZone = winZoneSearch[0];
 }
 
 void AKFGGameMode::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if(winZone == nullptr)
+        return;
+    
+    TArray<AActor*> enemyList;
+    winZone->GetOverlappingActors(enemyList,AEnemy::StaticClass());
+    
     if(currentLife <= 0)
         myGameState = EKFGGameState::LOOSE;
 
-    if(enemyCount <= 0)
+    if(enemyList.Num() <= 0)
         myGameState = EKFGGameState::WIN;
 
-    //GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyCount));
+    //GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,FString::FromInt(enemyList.Num()));
 }

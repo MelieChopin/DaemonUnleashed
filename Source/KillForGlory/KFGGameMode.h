@@ -46,7 +46,6 @@ public:
 	//// Game managment
 	UPROPERTY(BlueprintReadWrite)
 	EKFGGameState myGameState = EKFGGameState::RUN;
-	UPROPERTY(BlueprintReadWrite)
-	int enemyCount = 0;
+	AActor* winZone = nullptr;
 	
 };
